@@ -142,46 +142,6 @@ classdef Simulation < handle
             end
         end
 
-        %% Moves robot along provided trajectory
-        % Will stop and log a message if a collision is projected in the
-        % next movement. Will move brick with end effector if a brick is
-        % passed in as an argument.
-        function stop = MoveRobot(self, goalTraj, brick)
-            moveBrick = true;
-            stop = false;
-            if  nargin < 3
-                moveBrick = false;
-            end
-
-            for i = 1:size(goalTraj, 1)
-                qState = goalTraj(i,:);
-
-                % collision detection based on (Paul, G. Aug 2023)
-                [~, allLink] = self.robot.model.fkine(qState);
-                for j = 2:(size(allLink,2)-1)
-                    [~,check] = LinePlaneIntersection(self.baseNormal,self.basePlane,allLink(j).t',allLink(j+1).t');
-                    if check == 1
-                        stop = true;
-                        disp("COLLISION PREDICTED IN MOTION PLAN - ABORTING")
-                        break;
-                    end
-                end
-                if stop == true
-                    break
-                end
-
-                % move robot, gripper and, if applicable, the brick
-                self.robot.model.animate(qState);
-                eePose = self.robot.model.fkine(self.robot.model.getpos);
-
-                self.gripper.UpdateBase(eePose);
-                if moveBrick
-                    brick.base = eePose;
-                    brick.animate(0);
-                end
-            end
-        end
-
 
     end
 

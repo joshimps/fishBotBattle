@@ -5,7 +5,6 @@ classdef ChessBoard < handle
     properties
         posGrid;
         gridSize = 0.05; 
-
     end
     
     methods
@@ -19,10 +18,10 @@ classdef ChessBoard < handle
                 for j = 1:1:8
                     xOff = (j-1) * obj.gridSize + obj.gridSize/2;
                     yOff = (i-1) * obj.gridSize + obj.gridSize/2;
-                    obj.posGrid{i,j} = base + [0 0 0 xOff;
-                                               0 0 0 yOff;
-                                               0 0 0 0;
-                                               0 0 0 0];
+                    obj.posGrid{i,j} = base * troty(pi) + [0 0 0 xOff;
+                                                           0 0 0 yOff;
+                                                           0 0 0 0;
+                                                           0 0 0 0];
                 end
             end
         end
