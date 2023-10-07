@@ -1,0 +1,12 @@
+
+r = UR3;
+
+tr = r.model.fkine(r.model.getpos).T
+
+hold on;
+
+fingers = gripper(tr);
+
+pause(1);
+
+fingers.Up
