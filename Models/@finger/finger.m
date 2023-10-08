@@ -18,6 +18,7 @@ classdef finger < RobotBaseClass
             self.model.base = self.model.base.T * baseTr * troty(pi);
             % self.model.plot(zeros(1,3));
             self.PlotAndColourRobot();
+       
         end
 
         %% CreateModel
@@ -35,10 +36,10 @@ classdef finger < RobotBaseClass
             link(2).offset = 80*pi/180;
             link(3).offset = -10*pi/180;
 
-
             self.model = SerialLink(link,'name',self.name);
         end
 
+        
 
     end
 end

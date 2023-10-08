@@ -6,8 +6,8 @@ classdef gripper < handle
         gripperR;
         base;
         % set the open and close q values for the gripper
-        gripperopen = [deg2rad(0) deg2rad(0) deg2rad(0)];
-        gripperclose = [deg2rad(15) deg2rad(0) deg2rad(-10)];
+        gripperopen = [deg2rad(28.8) deg2rad(-50) deg2rad(21.6)];
+        gripperclose = [deg2rad(28.8) deg2rad(-30) deg2rad(0)];
         openmatrix;
         closematrix;
         steps = 10;

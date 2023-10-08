@@ -23,22 +23,24 @@ classdef chess < handle
 
         %> Dimensions of the workspace in regard to the padoc size
         workspaceDimensions;
+
+        % Chess Board Matrix
+        board_matrix;
+
     end
 
     methods
         %% ...structors
         function self = chess(chessCount)
             if 0 < nargin
-                self.chessCount = cowCount;
+                self.chessCount = chessCount;
             end
 
             self.workspaceDimensions = [-self.paddockSize(1)/2, self.paddockSize(1)/2 ...
                 ,-self.paddockSize(2)/2, self.paddockSize(2)/2 ...
                 ,0,self.maxHeight];
 
-            
-
-            self.chessBoard = self.GetChessModel('board',0);
+            self.chessBoard = self.GetChessModel;
             self.chessBoard.base = transl(0,0,0);
             plot3d(self.chessBoard,0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
             hold on;
@@ -47,52 +49,61 @@ classdef chess < handle
             x = 0.3775;
             y = 0.0275;
 
+            board_matrix = zeros(8,8);
+            row = 1;
             
             for i = 1:self.chessCount
                 n = mod(i,8);
-                base_pose = transl(x,y,0.1);
-
+                % base_pose = transl(x,y,0.155);
+                base_pose = transl(x,y,0.14);
+                
+                if n > 0
+                    self.board_matrix(row,n) = i;
+                else
+                    self.board_matrix(row,8) = i;
+                end
 
                 if i < 9 || i > 24 
                     switch n
                         case 1
                             self.chessModel{i} = self.GetChessModel('rook', i);
                         case 2
-                            self.chessModel{i} = self.GetChessModel(['knight', i]);
+                            self.chessModel{i} = self.GetChessModel('knight', i);
                         case 3
-                            self.chessModel{i} = self.GetChessModel(['bishop', i]);                     
+                            self.chessModel{i} = self.GetChessModel('bishop', i);                     
                         case 4
-                            self.chessModel{i} = self.GetChessModel(['queen', i]);    
+                            self.chessModel{i} = self.GetChessModel('queen', i);    
                         case 5
-                            self.chessModel{i} = self.GetChessModel(['king', i]);
+                            self.chessModel{i} = self.GetChessModel('king', i);
                         case 6
-                            self.chessModel{i} = self.GetChessModel(['bishop', i]);
+                            self.chessModel{i} = self.GetChessModel('bishop', i);
                         case 7
-                            self.chessModel{i} = self.GetChessModel(['knight', i]);
+                            self.chessModel{i} = self.GetChessModel('knight', i);
                         case 0
-                            self.chessModel{i} = self.GetChessModel(['rook', i]);
+                            self.chessModel{i} = self.GetChessModel('rook', i);
                     end
 
                 else
-                    self.chessModel{i} = self.GetChessModel(['pawn', i]);
+                    self.chessModel{i} = self.GetChessModel('pawn', i);
                 end
 
                 self.chessModel{i}.base = base_pose;
-                base_pose
-                
 
                 if n == 0
                     x = x - 0.045;
                     y = 0.0275;
+                    row = row + 1;
                     if i == 16
                       x = 0.070;
+                      row = row + 4;
                     end
                 else
                     y = y + 0.05;
                 end
 
                  % Plot 3D model
-                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
+                % plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
+                 plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0);
 
             end
 
@@ -100,6 +111,8 @@ classdef chess < handle
             if isempty(findobj(get(gca,'Children'),'Type','Light'))
                 camlight
             end
+
+            
 
             end
         end
@@ -110,30 +123,37 @@ classdef chess < handle
             if nargin < 1
                 name = 'board';
                 [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
+                piece = 'board0';
             end
             
-            switch name
-                case 'board'
-                    [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
-                case 'rook'
-                    [faceData,vertexData] = plyread('rook_prism.ply','tri');
-                case 'knight'
-                    [faceData,vertexData] = plyread('knight_prism.ply','tri');
-                case 'bishop'
-                    [faceData,vertexData] = plyread('bishop_prism.ply','tri');
-                case 'queen'
-                    [faceData,vertexData] = plyread('queen_prism.ply','tri');
-                case 'king'
-                    [faceData,vertexData] = plyread('King_prism.ply','tri');
-                case 'pawn'
-                    [faceData,vertexData] = plyread('pawn_prism.ply','tri');
+            % Uncomment out this section once ply files are fixed.
+            % switch name
+            %     case 'board'
+            %         [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
+            %     case 'rook'
+            %         [faceData,vertexData] = plyread('rook_prism.ply','tri');
+            %     case 'knight'
+            %         [faceData,vertexData] = plyread('knight_prism.ply','tri');
+            %     case 'bishop'
+            %         [faceData,vertexData] = plyread('bishop_prism.ply','tri');
+            %     case 'queen'
+            %         [faceData,vertexData] = plyread('queen_prism.ply','tri');
+            %     case 'king'
+            %         [faceData,vertexData] = plyread('King_prism.ply','tri');
+            %     case 'pawn'
+            %         [faceData,vertexData] = plyread('pawn_prism.ply','tri');
+            % end
+
+            if strcmp(name, 'board')
+                name = 'board';
+                [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
+                piece = 'board0';
             end
 
-            piece = [name,num2str(id)]
-            
-            % if nargin > 0
-            %     [faceData,vertexData] = plyread('test_block.ply','tri');
-            % end
+            if ~(strcmp(name, 'board'))
+                [faceData,vertexData] = plyread('test_block.ply','tri');
+                piece = [name,num2str(id)];
+            end
 
           
             link1 = Link('alpha',0,'a',0,'d',0,'offset',0);
@@ -167,6 +187,13 @@ classdef chess < handle
 
             % Redraw the scene with the updated brick location
         end
+
+        function board = getChessBoard(self)
+
+            board = self.board_matrix;
+
+        end
+
     
     end
 end
