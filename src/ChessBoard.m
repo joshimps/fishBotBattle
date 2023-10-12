@@ -4,6 +4,8 @@ classdef ChessBoard < handle
     
     properties
         posGrid;
+        dump0; % dump zone for robot 0
+        dump1; % dump zone for robot 1
         gridSize = 0.05; 
     end
     

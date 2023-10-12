@@ -9,12 +9,20 @@ classdef RosController < handle
         % goal;
         % seq;
         chessClient;
+        chessMove; 
     end
 
     methods
         function Connect(self, ip_add)
-            rosinit(ip_add);
-            self.chessClient = rossvcclient("/chess_service", "chess_service");
+            default_ip = 'http://mitch-pc:11311/';
+            if nargin > 1
+                default_ip = ip_add;
+            end
+            try 
+                rosshutdown
+            end
+            rosinit(default_ip)
+            [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
 
             % self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
             % 
@@ -27,8 +35,9 @@ classdef RosController < handle
             % self.seq = 1; 
         end
 
-        function [recMove] = getMove(sendMove)
-            Move = self.chessClient.call(sendMove);
+        function [recMove] = getMove(self,sendMove)
+            self.chessMove.PrevMove = sendMove;
+            recMove = call(self.chessClient, self.chessMove);
         end
 
 

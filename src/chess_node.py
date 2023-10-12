@@ -24,13 +24,13 @@ def chessCallback(req):
         action = fish.play(board,time_limit)
         chess_move = str(action.move)
         if board.is_capture(action.move): 
-            result = chess_move +',yes'+',no'
+            result = chess_move +',1'+',0'
         elif board.is_castling(action.move): 
-            result = chess_move +',no'+',yes'
+            result = chess_move +',0'+',1'
         elif len(chess_move) == 5: 
-            result = chess_move[:-1] +',no'+',no' + ',' + chess_move[-1]
+            result = chess_move[:-1] +',0'+',0' + ',' + chess_move[-1]
         else: 
-            result = chess_move +',no'+',no'
+            result = chess_move +',0'+',0'
         return chess_serviceResponse(result)
     else: return chess_serviceResponse("")
 
