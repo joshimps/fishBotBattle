@@ -3,6 +3,8 @@ classdef omronTM5 < RobotBaseClass
 
     properties(Access = public)
         plyFileNameStem = 'omronTM5';
+        TMgripper;
+
     end
 
     methods
@@ -13,10 +15,12 @@ classdef omronTM5 < RobotBaseClass
                 baseTr = eye(4);
             end
 
-            self.model.base = self.model.base.T * baseTr ;
-
+            self.model.base = self.model.base.T * baseTr;
+            
             self.PlotAndColourRobot();
-            self.model.teach;
+            tr = self.model.fkine(self.model.getpos).T;
+            self.TMgripper = gripper(tr);
+            % self.model.teach;
 
         end
 
