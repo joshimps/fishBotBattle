@@ -7,37 +7,62 @@ classdef ChessController < handle
         robot0;
         robot1;
         turn;
-        
+        rosCont; 
     end
     
     methods
-        function obj = ChessController(pvp)
+        function obj = ChessController(pve)
             base0 = eye(4);
             baseBoard = base0 * transl(0.5, 0, 0);
             base1 = base0 * transl(1, 0, 0) * trotz(pi);
             obj.board = ChessBoard(baseBoard);
-            if pvp == 1
+            obj.rosCont = RosController();
+            obj.rosCont.Connect(); 
+            if pve == 1
                 %obj.robot0 = TM5(); 
             else
                 obj.robot1 = UR3(base1);
                 obj.robot0 = UR3(base0); 
             end
-            obj.turn = 0; 
+            obj.turn = 0;  
         end
-        
-        %takes, castles and promotes not implemented yet
+
+        function chessGameEvE(obj)
+           prevMove = 'e2e4';
+           obj.interpMoveString(prevMove);
+           gameIsOver = 0; 
+           while ~gameIsOver
+               newMove = rc.getMove(prevMove);
+               obj.interpMoveString(newMove.Move);
+               if size(newMove.Move,2) < 1
+                   gameIsOver = true;
+               end
+           end
+           disp("Game is over, winner is " + ~obj.turn);
+        end
+
+        %castles and promotes not implemented yet
         function interpMoveString(obj, moveString)
             Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             %moveString = char(moveString);
             [~, Nums] = ismember(moveString, Alphabet);
             startMove = obj.board.posGrid{Nums(1),str2double(moveString(2))};
             endMove = obj.board.posGrid{Nums(3),str2double(moveString(4))};
+            capture = str2double(moveString(6));
+            %castling = str2double(moveString(8));
+            %promotion = 0; 
+            %if length(moveString)>8
+            %    promotion = moveString(10);
+            %end
             if obj.turn == 0
                 robot = obj.robot0;
             else 
                 robot = obj.robot1;
             end
             obj.turn = ~obj.turn;
+            if capture
+                obj.movePiece(robot, endMove, obj.board.dump0); 
+            end
             obj.movePiece(robot, startMove, endMove);
         end
 
