@@ -1,4 +1,4 @@
-classdef omronTM5 < RobotBaseClass
+classdef omronTM5 < customRobotBaseClass
     %% LinearUR3 UR3 on a non-standard linear rail created by a student
 
     properties(Access = public)

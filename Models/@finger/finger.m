@@ -1,5 +1,5 @@
 
-classdef finger < RobotBaseClass
+classdef finger < customRobotBaseClass
 
 
     properties(Access = public)

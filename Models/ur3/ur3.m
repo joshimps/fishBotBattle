@@ -1,4 +1,4 @@
-classdef ur3 < RobotBaseClass
+classdef ur3 < customRobotBaseClass
     %% UR3 Universal Robot 3kg payload robot model
     %
     % WARNING: This model has been created by UTS students in the subject
