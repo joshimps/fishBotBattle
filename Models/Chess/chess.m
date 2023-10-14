@@ -102,8 +102,8 @@ classdef chess < handle
                 end
 
                  % Plot 3D model
-                % plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
-                 plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0);
+                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
+                 %plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0);
 
             end
 
