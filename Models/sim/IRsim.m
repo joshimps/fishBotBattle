@@ -21,11 +21,11 @@ classdef IRsim < handle
             if nargin < 1
                 baseTr = eye(4);
             end
-
-            world_offset = baseTr * transl(1,0,0);
-
-            self.ur = ur3(baseTr);
-            self.tm5 = omronTM5(world_offset);
+            
+            ur_tr = baseTr * transl(-0.2, 0.25, 0);
+            omron_tr = baseTr * transl(0.7,0.25,0);
+            self.ur = ur3(ur_tr);
+            self.tm5 = omronTM5(omron_tr);
             self.chess = chess();
             self.environment = PlaceObject('robotRoom.ply', [0 0 0]);
             

@@ -200,7 +200,7 @@ classdef customRobotBaseClass < handle
             roughMinMax = sum(abs(self.model.d) + abs(self.model.a));
             self.workspace = [-roughMinMax roughMinMax -roughMinMax roughMinMax -0.01 roughMinMax]; 
 
-            self.model.plot3d(self.homeQ,'noarrow','workspace',self.workspace,'view',[ax,by]);%,'notiles', 'nowrist');            
+            self.model.plot3d(self.homeQ,'noarrow','workspace',self.workspace,'view',[ax,by], 'nowrist');%,'notiles', 'nowrist');            
 
             % Check if a single surface has been added by plot3d
             if self.CountTiledFloorSurfaces() - initialSurfaceCount == 1
