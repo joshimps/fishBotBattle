@@ -8,7 +8,7 @@ classdef IRsim < handle
     properties
         ur;
         tm5;
-        chess;
+        board;
         baseTr;
         world_offset;
         environment;
@@ -26,7 +26,7 @@ classdef IRsim < handle
             omron_tr = baseTr * transl(0.7,0.25,0);
             self.ur = ur3(ur_tr);
             self.tm5 = omronTM5(omron_tr);
-            self.chess = chess();
+            self.board = ChessBoard();
             self.environment = PlaceObject('robotRoom.ply', [0 0 0]);
             
 

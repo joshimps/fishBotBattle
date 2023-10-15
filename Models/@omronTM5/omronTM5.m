@@ -3,7 +3,7 @@ classdef omronTM5 < customRobotBaseClass
 
     properties(Access = public)
         plyFileNameStem = 'omronTM5';
-        TMgripper;
+        gripper;
 
     end
 
@@ -19,7 +19,7 @@ classdef omronTM5 < customRobotBaseClass
             
             self.PlotAndColourRobot();
             tr = self.model.fkine(self.model.getpos).T;
-            self.TMgripper = gripper(tr);
+            self.gripper = gripper(tr);
             % self.model.teach;
 
         end

@@ -8,7 +8,7 @@ classdef ur3 < customRobotBaseClass
 
     properties(Access = public)   
         plyFileNameStem = 'UR3';
-        TMgripper;
+        gripper;
        
     end
     
@@ -34,7 +34,7 @@ classdef ur3 < customRobotBaseClass
             self.PlotAndColourRobot();
             
             tr = self.model.fkine(self.model.getpos).T;
-            self.TMgripper = gripper(tr);
+            self.gripper = gripper(tr);
 
             drawnow
         end
