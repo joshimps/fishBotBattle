@@ -29,8 +29,8 @@ classdef gripper < handle
         end
 
         function UpdateBase(obj, base)
-            obj.gripperL.model.base = base * trotx(pi/2)*troty(pi);
-            obj.gripperR.model.base = base * trotx(pi/2);
+            obj.gripperL.model.base = base.T * trotx(pi/2)*troty(pi);
+            obj.gripperR.model.base = base.T * trotx(pi/2);
 
             obj.gripperL.model.animate(obj.gripperopen);
             obj.gripperR.model.animate(obj.gripperopen);
