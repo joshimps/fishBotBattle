@@ -21,6 +21,7 @@ classdef ChessBoard < handle
         end
         
         function SpawnPosGrid(obj, base)
+            index = 0;
             for i = 1:1:8
                 for j = 1:1:8
                     xOff = (j-1) * obj.gridSize + obj.gridSize/2;
@@ -29,12 +30,16 @@ classdef ChessBoard < handle
                                                            0 0 0 yOff;
                                                            0 0 0 0.14;
                                                            0 0 0 0];
-                    index = i+j-1;
-                    if index > 16
-                        index = index + 32;
+                    index = index + 1;
+                    if index < 17 || index > 47
+                        if index > 47
+                            pieceIndex = index - 32;
+                        else
+                            pieceIndex = index
+                        end
+                        obj.chessPieces.chessModel{pieceIndex}.base = obj.posGrid{i,j}.pose;
+                        obj.posGrid{i,j}.piece  = obj.chessPieces.chessModel{pieceIndex};
                     end
-                    obj.chessPieces.chessModel{index}.base = obj.posGrid{i,j}.pose;
-                    obj.posGrid{i,j}.piece  = obj.chessPieces.chessModel{index};
                 end
             end
         end
