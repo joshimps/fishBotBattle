@@ -47,6 +47,9 @@ classdef IRsim < handle
                 ,[-0.8,-0.8;-0.8,-0.8] ...
                 ,'CData',imread('concrete.jpg') ...
                 ,'FaceColor','texturemap');
+
+            view(3)
+            axis([-1 1 -1 1.5 -0.1 1.5])
             
             end
     end

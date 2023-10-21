@@ -27,6 +27,8 @@ classdef chess < handle
         % Chess Board Matrix
         board_matrix;
 
+        vertex_size;
+
     end
 
     methods
@@ -100,9 +102,17 @@ classdef chess < handle
                 else
                     y = y + 0.05;
                 end
+                
+                if i < 17
+                    % rgd_data = zeros(self.vertex_size,3)
+                    colors = {'white'};
+                else
+                    colors = {'brown'};
+                    % rgb_data = repmat(255, self.vertex_size, 3)
+                end
 
                  % Plot 3D model
-                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist');
+                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist', 'color', colors);
                  %plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0);
 
             end
@@ -127,33 +137,38 @@ classdef chess < handle
             end
             
             % Uncomment out this section once ply files are fixed.
-            % switch name
-            %     case 'board'
-            %         [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
-            %     case 'rook'
-            %         [faceData,vertexData] = plyread('rook_prism.ply','tri');
-            %     case 'knight'
-            %         [faceData,vertexData] = plyread('knight_prism.ply','tri');
-            %     case 'bishop'
-            %         [faceData,vertexData] = plyread('bishop_prism.ply','tri');
-            %     case 'queen'
-            %         [faceData,vertexData] = plyread('queen_prism.ply','tri');
-            %     case 'king'
-            %         [faceData,vertexData] = plyread('King_prism.ply','tri');
-            %     case 'pawn'
-            %         [faceData,vertexData] = plyread('pawn_prism.ply','tri');
-            % end
+            switch name
+                case 'board'
+                    [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
+                case 'rook'
+                    [faceData,vertexData] = plyread('rook_prism_meshlab.ply','tri');
+                case 'knight'
+                    [faceData,vertexData] = plyread('knight_prism_meshlab.ply','tri');
+                case 'bishop'
+                    [faceData,vertexData] = plyread('bishop_prism_meshlab.ply','tri');
+                case 'queen'
+                    [faceData,vertexData] = plyread('queen_prism_meshlab.ply','tri');
+                case 'king'
+                    [faceData,vertexData] = plyread('King_prism_meshlab.ply','tri');
+                case 'pawn'
+                    [faceData,vertexData] = plyread('pawn_prism_meshlab.ply','tri');
+            end
+
+                            
+            if ~(strcmp(name, 'board'))
+                piece = [name,num2str(id)];
+                self.vertex_size = size(vertexData,1);
+            end
 
             if strcmp(name, 'board')
-                name = 'board';
                 [faceData,vertexData] = plyread('Chess Board Simple-Assembly.PLY','tri');
                 piece = 'board0';
             end
 
-            if ~(strcmp(name, 'board'))
-                [faceData,vertexData] = plyread('test_block.ply','tri');
-                piece = [name,num2str(id)];
-            end
+            % if ~(strcmp(name, 'board'))
+            %     [faceData,vertexData] = plyread('test_block.ply','tri');
+            %     piece = [name,num2str(id)];
+            % end
 
           
             link1 = Link('alpha',0,'a',0,'d',0,'offset',0);
@@ -169,6 +184,10 @@ classdef chess < handle
             % {[], vertexData} so that data is attributed to Link 1
             % in plot3d rather than Link 0 (base).
             model.points = {[], vertexData};
+
+            
+
+
         end
 
         function moveBrick(self, brickIndex, transformationMatrix)
