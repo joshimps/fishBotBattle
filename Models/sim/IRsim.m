@@ -28,14 +28,15 @@ classdef IRsim < handle
             hold on
             view(3)
             
-            ur_tr = baseTr * transl(-0.2, 0.25, 0);
-            omron_tr = baseTr * transl(0.7,0.25,0);
+            ur_tr = baseTr * transl(-0.15, 0.25, 0);
+            omron_tr = baseTr * transl(0.75,0.25,0.1);
+            curtain_tr = baseTr * transl(0.7, 0.25, 0);
 
             self.ur = ur3(ur_tr);
             if (strcmp(mode,'PvP'))
                 self.tm5 = omronTM5(omron_tr);
             else
-                self.curtain = lightCurtain(omron_tr);
+                self.curtain = lightCurtain(curtain_tr);
             end
             self.board = ChessBoard();            
             self.environment = PlaceObject('robotRoom2.ply', [0 0 0]);

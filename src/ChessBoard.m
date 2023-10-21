@@ -7,6 +7,7 @@ classdef ChessBoard < handle
         chessPieces; 
         dump0; % dump zone for robot 0
         dump1; % dump zone for robot 1
+        tempZone; %temp zone for castling
         gridSize = 0.05; 
     end
     
@@ -18,6 +19,8 @@ classdef ChessBoard < handle
             obj.posGrid = cell(8,8);
             obj.chessPieces = chess(); 
             obj.SpawnPosGrid(base);
+            obj.dump0 = base * troty(pi) * transl(-0.15, 0.55, 0.2);
+            obj.dump1 = base * troty(pi) * transl(-0.75, 0.55, 0.2);
         end
         
         function SpawnPosGrid(obj, base)
@@ -29,7 +32,7 @@ classdef ChessBoard < handle
                     yOff = (j-1) * obj.gridSize + obj.gridSize/2;
                     obj.posGrid{i,j}.pose = base * troty(pi) + [0 0 0 xOff;
                                                            0 0 0 -yOff;
-                                                           0 0 0 -0.05;
+                                                           0 0 0 0;
                                                            0 0 0 0];
                     index = index + 1;
                     if index < 17 || index > 48
@@ -38,7 +41,7 @@ classdef ChessBoard < handle
                         else
                             pieceIndex = index;
                         end
-                        obj.chessPieces.chessModel{pieceIndex}.base = obj.posGrid{i,j}.pose;
+                        obj.chessPieces.chessModel{pieceIndex}.base = obj.posGrid{i,j}.pose * transl(0,0,0.1);
                         obj.posGrid{i,j}.piece  = obj.chessPieces.chessModel{pieceIndex};
                         obj.chessPieces.chessModel{pieceIndex}.animate(0);
                     end

@@ -6,8 +6,8 @@ classdef ChessController < handle
         sim;
         urReadyPose = [0, -1.1, -2, -1.5, 1.8,0];
         urWaitPose = [0 -0.25 -2.4 -0.4 1.8 0];
-        tmReadyPose = [0, 1.8, 1.9, 1, 1.6,0];
-        tmWaitPose = [0, 0.75, 1.9, 1, 1.6,0];
+        tmReadyPose = [0, 1.4, 1.9, -1.7, -1.5,0];
+        tmWaitPose = [0, 0.9, 1.9, -1.85, -1.5,0];
         ready = [];
         turn;
         rosCont; 
@@ -32,7 +32,7 @@ classdef ChessController < handle
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
-            obj.rosCont.Connect(); 
+            % obj.rosCont.Connect(); 
         end
 
         function chessGameEvE(obj)
@@ -50,6 +50,27 @@ classdef ChessController < handle
            disp("Game is over, winner is " + ~obj.turn);
         end
 
+        function chessGamePvE(obj)
+           prevMove = 'e2e4,0,0';
+           obj.interpMoveString(prevMove);
+           gameIsOver = 0; 
+           while ~gameIsOver
+               if obj.turn == 0
+                   engineMove = obj.rosCont.getMove(prevMove(1:4));
+                   newMove = engineMove.move;
+               else
+                   newMove = input("Enter Player Prompt", 's');
+               end
+                   
+               if size(newMove,2) < 1
+                   gameIsOver = true;
+               end
+               obj.interpMoveString(newMove);
+               prevMove = newMove;
+           end
+           disp("Game is over, winner is " + ~obj.turn);
+           end
+
         %castles and promotes not implemented yet
         function interpMoveString(obj, moveString)
             disp(moveString);
@@ -59,6 +80,8 @@ classdef ChessController < handle
             startMove = obj.sim.board.posGrid{str2double(moveString(2)),Nums(1)}.pose;
             endMove = obj.sim.board.posGrid{str2double(moveString(4)), Nums(3)}.pose;
             piece = obj.sim.board.posGrid{str2double(moveString(2)),Nums(1)}.piece;
+            obj.sim.board.posGrid{str2double(moveString(2)),Nums(1)}.piece = 0;
+            obj.sim.board.posGrid{str2double(moveString(4)),Nums(3)}.piece = piece;
             capture = str2double(moveString(6));
             %castling = str2double(moveString(8));
             %promotion = 0; 
@@ -69,14 +92,17 @@ classdef ChessController < handle
                 robot = obj.sim.ur;
                 obj.ready = obj.urReadyPose;
                 wait = obj.urWaitPose;
+                dump = obj.sim.board.dump0;
             else 
                 robot = obj.sim.tm5;
                 obj.ready = obj.tmReadyPose;
                 wait = obj.tmWaitPose;
+                dump = obj.sim.board.dump1;
             end
             obj.turn = ~obj.turn;
             if capture
-                obj.movePiece(robot, endMove, obj.sim.board.dump0, piece); 
+                capturePiece = obj.sim.board.posGrid{str2double(moveString(2)),Nums(1)}.piece;
+                obj.movePiece(robot, endMove, dump, piece); 
             end
             obj.movePiece(robot, startMove, endMove, piece);
             obj.MoveRobot(robot, wait, true);
@@ -84,15 +110,17 @@ classdef ChessController < handle
 
         function movePiece(obj, robot, startMove, endMove, piece)
             obj.MoveRobot(robot, obj.ready, true);
-            startMoveReady = startMove * transl(0,0,-0.4);
+            startMoveReady = startMove * transl(0,0,-0.3);
             obj.MoveRobot(robot, startMoveReady, false);
-            startMovePick = startMoveReady * transl(0,0,0.05);
+            startMovePick = startMoveReady * transl(0,0,0.15);
             obj.MoveRobot(robot, startMovePick, false);
+            robot.gripper.Close();
             obj.MoveRobot(robot, obj.ready, true, piece);
-            endMoveReady = endMove * transl(0,0,0.2);
+            endMoveReady = endMove * transl(0,0,-0.3);
             obj.MoveRobot(robot, endMoveReady, false, piece);
-            endMovePlace = endMoveReady * transl(0,0,-0.1);
+            endMovePlace = endMoveReady * transl(0,0,0.15);
             obj.MoveRobot(robot, endMovePlace, false, piece);
+            robot.gripper.Open();
             obj.MoveRobot(robot, obj.ready, true);
         end
         
@@ -139,7 +167,7 @@ classdef ChessController < handle
                 
                 robot.gripper.UpdateBase(eePose);
                 if movePiece
-                    piece.tool = eePose;
+                    piece.base = eePose.T * troty(pi);
                     piece.animate(0);
                 end
             end
