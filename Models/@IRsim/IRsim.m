@@ -14,6 +14,9 @@ classdef IRsim < handle
         world_offset;
         environment;
         curtain;
+        omron_stand;
+        bucket0;
+        bucket1;
 
     end
 
@@ -34,12 +37,17 @@ classdef IRsim < handle
 
             self.ur = ur3(ur_tr);
             if mode == 1
-                self.tm5 = omronTM5(omron_tr);
-            else
+                self.environment = PlaceObject('robotRoom_PvE.ply', [0 0 0]);
                 self.curtain = lightCurtain(curtain_tr);
+            else
+                self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
+                self.tm5 = omronTM5(omron_tr);
             end
             self.board = ChessBoard();            
-            self.environment = PlaceObject('robotRoom2.ply', [0 0 0]);
+            
+            % self.omron_stand = PlaceObject('omron_stand.ply', [0.75 0.25 0]);
+            % bucket0_pos = [self.board.dump0(1,4),self.board.dump0(2,4), self.board.dump0(3,4)]
+            % self.bucket0 = PlaceObject('bucket.ply', bucket0_pos);
 
             %place the floor into the world.
             surf([-5,-5; 5,5] ...
@@ -49,7 +57,7 @@ classdef IRsim < handle
                 ,'FaceColor','texturemap');
 
             view(3)
-            axis([-1 1 -1 1.5 -0.1 1.5])
+            axis([-1 1.25 -1 1 -0.1 1.5])
             
             end
     end

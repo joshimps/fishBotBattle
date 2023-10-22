@@ -150,7 +150,7 @@ classdef lightCurtain < handle
                 end
 
                 if stop == 1
-                    stopMessage = sprintf('STOP: Something has crossed the light curtain.');
+                    stopMessage = sprintf('STOP: Curtain plane has been broken');
                     disp(stopMessage) % display status to command window for log
                     stopMessage_text = text(0, 1, 1, stopMessage); % display status in the figure
                     break
