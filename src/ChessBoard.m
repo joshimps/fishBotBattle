@@ -41,7 +41,7 @@ classdef ChessBoard < handle
                         else
                             pieceIndex = index;
                         end
-                        obj.chessPieces.chessModel{pieceIndex}.base = obj.posGrid{i,j}.pose * transl(0,0,0.1);
+                        obj.chessPieces.chessModel{pieceIndex}.base = obj.posGrid{i,j}.pose * troty(-pi) * transl(0,0,0.14) ;
                         obj.posGrid{i,j}.piece  = obj.chessPieces.chessModel{pieceIndex};
                         obj.chessPieces.chessModel{pieceIndex}.animate(0);
                     end

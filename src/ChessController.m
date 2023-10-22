@@ -31,7 +31,7 @@ classdef ChessController < handle
             obj.sim = IRsim;
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
-            obj.rosCont = RosController();
+            % obj.rosCont = RosController();
             % obj.rosCont.Connect(); 
         end
 

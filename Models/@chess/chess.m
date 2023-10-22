@@ -139,7 +139,7 @@ classdef chess < handle
             % Uncomment out this section once ply files are fixed.
             switch name
                 case 'board'
-                    [faceData,vertexData] = plyread('Chess Board Simple-Assembly.ply','tri');
+                    [faceData,vertexData] = plyread('Chess Board Simple-Assembly.PLY','tri');
                 case 'rook'
                     [faceData,vertexData] = plyread('rook_prism_meshlab.ply','tri');
                 case 'knight'
@@ -149,7 +149,7 @@ classdef chess < handle
                 case 'queen'
                     [faceData,vertexData] = plyread('queen_prism_meshlab.ply','tri');
                 case 'king'
-                    [faceData,vertexData] = plyread('King_prism_meshlab.ply','tri');
+                    [faceData,vertexData] = plyread('King_Prism_meshlab.ply','tri');
                 case 'pawn'
                     [faceData,vertexData] = plyread('pawn_prism_meshlab.ply','tri');
             end
@@ -157,7 +157,6 @@ classdef chess < handle
                             
             if ~(strcmp(name, 'board'))
                 piece = [name,num2str(id)];
-                self.vertex_size = size(vertexData,1);
             end
 
             if strcmp(name, 'board')
