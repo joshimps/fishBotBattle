@@ -19,10 +19,10 @@ classdef IRsim < handle
 
     methods
         %% ...structors
-        function self = IRsim(baseTr, mode)
-            if nargin < 1
+        function self = IRsim(mode,baseTr)
+            if nargin < 2
                 baseTr = eye(4);
-                mode = 'PvP';
+                mode = 1;
             end
 
             hold on
@@ -33,7 +33,7 @@ classdef IRsim < handle
             curtain_tr = baseTr * transl(0.7, 0.25, 0);
 
             self.ur = ur3(ur_tr);
-            if (strcmp(mode,'PvP'))
+            if mode == 1
                 self.tm5 = omronTM5(omron_tr);
             else
                 self.curtain = lightCurtain(curtain_tr);

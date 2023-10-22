@@ -1,21 +1,21 @@
 classdef RosController < handle
 
     properties
-        % jointStateSubscriber;
-        % currentJointState_123456;
-        % nextJointState; 
-        % jointNames;
-        % controlClient;
-        % goal;
-        % seq;
+        jointStateSubscriber;
+        currentJointState_123456;
+        nextJointState; 
+        jointNames;
+        controlClient;
+        goal;
+        seq;
         chessClient;
         chessMove; 
     end
 
     methods
-        function Connect(self, ip_add)
+        function Connect(self, real_control, ip_add)
             default_ip = 'http://mitch-pc:11311/';
-            if nargin > 1
+            if nargin > 2
                 default_ip = ip_add;
             end
             try 
@@ -23,23 +23,24 @@ classdef RosController < handle
             end
             rosinit(default_ip)
             [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
-
-            % self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
-            % 
-            % pause(2); % Pause to give time for a message to appear
-            % currentJointState_321456 = (self.jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
-            % self.currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
-            % self.jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
-            % 
-            % [self.controlClient, self.goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
-            % self.seq = 1; 
+            
+            if real_control == 1
+                self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
+    
+                pause(2); % Pause to give time for a message to appear
+                currentJointState_321456 = (self.jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
+                self.currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
+                self.jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
+    
+                [self.controlClient, self.goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
+                self.seq = 1; 
+            end
         end
 
         function [recMove] = getMove(self,sendMove)
             self.chessMove.PrevMove = sendMove;
             recMove = call(self.chessClient, self.chessMove);
         end
-
 
         function SetGoal(self, duration, joints, reset)
             self.goal.Trajectory.JointNames = self.jointNames;
@@ -70,7 +71,7 @@ classdef RosController < handle
         end
 
         function doGoal(self)
-            sendGoal(self.controlClient,self.goal);
+            sendGoalAndWait(self.controlClient,self.goal);
             self.currentJointState_123456 = self.nextJointState;
         end
 
