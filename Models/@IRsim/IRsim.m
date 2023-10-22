@@ -36,7 +36,7 @@ classdef IRsim < handle
             curtain_tr = baseTr * transl(0.7, 0.25, 0);
 
             self.ur = ur3(ur_tr);
-            if mode == 1
+            if mode == 0
                 self.environment = PlaceObject('robotRoom_PvE.ply', [0 0 0]);
                 self.curtain = lightCurtain(curtain_tr);
             else

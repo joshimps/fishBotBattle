@@ -1,6 +1,12 @@
 classdef ChessController < handle
     %CHESSCONTROLLER Summary of this class goes here
     %   Detailed explanation goes here
+    %% TODO
+    % PVE mode needs to be split into pve sim and pve real and 
+    % pieces moved automatically
+    % ur3 cant reach the last row of the board, may need to elevate it
+    % add more waypoints directly above picking and placing to prevent clipping
+    % add gripper control
     
     properties
         sim;
@@ -32,8 +38,8 @@ classdef ChessController < handle
         end
 
         function chessGameEvE(obj)
-           prevMove = 'e1g1,0,1';
-           % obj.interpMoveString(prevMove);
+           prevMove = 'e2e4,0,0';
+           obj.interpMoveString(prevMove);
            gameIsOver = 0; 
            while ~gameIsOver
                newMove = obj.rosCont.getMove(prevMove(1:4));
@@ -60,9 +66,11 @@ classdef ChessController < handle
                    
                if size(newMove,2) < 1
                    gameIsOver = true;
+               
+               else
+                obj.interpMoveString(newMove);
+                prevMove = newMove;
                end
-               obj.interpMoveString(newMove);
-               prevMove = newMove;
            end
            disp("Game is over, winner is " + ~obj.turn);
            end
