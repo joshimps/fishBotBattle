@@ -45,9 +45,7 @@ classdef IRsim < handle
             end
             self.board = ChessBoard();            
             
-            % self.omron_stand = PlaceObject('omron_stand.ply', [0.75 0.25 0]);
-            % bucket0_pos = [self.board.dump0(1,4),self.board.dump0(2,4), self.board.dump0(3,4)]
-            % self.bucket0 = PlaceObject('bucket.ply', bucket0_pos);
+      
 
             %place the floor into the world.
             surf([-5,-5; 5,5] ...

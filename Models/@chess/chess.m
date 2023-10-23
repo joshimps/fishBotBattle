@@ -38,9 +38,8 @@ classdef chess < handle
                 self.chessCount = chessCount;
             end
 
-            self.workspaceDimensions = [-self.paddockSize(1)/2, self.paddockSize(1)/2 ...
-                ,-self.paddockSize(2)/2, self.paddockSize(2)/2 ...
-                ,0,self.maxHeight];
+            self.workspaceDimensions = [0. 0.4 0 0.4 0 1.5];
+
 
             self.chessBoard = self.GetChessModel;
             self.chessBoard.base = transl(0,0,0);
@@ -112,7 +111,7 @@ classdef chess < handle
                 end
 
                  % Plot 3D model
-                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist', 'color', colors);
+                plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0,'noarrow', 'nowrist', 'tilesize', 0.05, 'color', colors);
                  %plot3d(self.chessModel{i},0,'workspace',self.workspaceDimensions,'view',[-30,30],'delay',0);
 
             end

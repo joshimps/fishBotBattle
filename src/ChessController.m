@@ -34,7 +34,7 @@ classdef ChessController < handle
             end
             obj.rosCont = RosController();
             obj.realControl = realControl;
-            obj.rosCont.Connect(realControl); 
+            % obj.rosCont.Connect(realControl); 
         end
 
         function chessGameEvE(obj)

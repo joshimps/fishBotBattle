@@ -19,8 +19,8 @@ classdef ChessBoard < handle
             obj.posGrid = cell(8,8);
             obj.chessPieces = chess(); 
             obj.SpawnPosGrid(base);
-            obj.dump0 = base * troty(pi) * transl(-0.15, 0.55, 0.2);
-            obj.dump1 = base * troty(pi) * transl(0.55, 0.55, 0.2);
+            obj.dump0 = base * transl(-0.15, 0.55, 0.1) * troty(pi) * trotz(-pi);
+            obj.dump1 = base * transl(0.55, 0.70, 0.1) * troty(pi) * trotz(-pi);
         end
         
         function SpawnPosGrid(obj, base)
