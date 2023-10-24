@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+    <rosparam command="load" file="$(find fishbot_ros)/config/chess.yaml"/>
+    
+    <node pkg="fishbot_ros" type="chess_node.py" name="chess_service">
+    </node>
+
+</launch>
