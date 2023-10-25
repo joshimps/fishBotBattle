@@ -135,15 +135,21 @@ classdef ChessController < handle
             obj.MoveRobot(robot, obj.ready, true);
             startMoveReady = startMove * transl(0,0,-0.3);
             obj.MoveRobot(robot, startMoveReady, false);
-            startMovePick = startMoveReady * transl(0,0,0.15);
+            startMoveMid = startMoveReady * transl(0,0,0.075);
+            obj.MoveRobot(robot, startMoveMid, false);
+            startMovePick = startMoveMid * transl(0,0,0.07);
             obj.MoveRobot(robot, startMovePick, false);
             robot.gripper.Close();
+            obj.MoveRobot(robot, startMoveMid, false, piece);
             obj.MoveRobot(robot, obj.ready, true, piece);
             endMoveReady = endMove * transl(0,0,-0.3);
             obj.MoveRobot(robot, endMoveReady, false, piece);
-            endMovePlace = endMoveReady * transl(0,0,0.15);
+            endMoveMid = endMoveReady * transl(0,0,0.07);
+            obj.MoveRobot(robot, endMoveMid, false,piece);
+            endMovePlace = endMoveMid * transl(0,0,0.079);
             obj.MoveRobot(robot, endMovePlace, false, piece);
             robot.gripper.Open();
+            obj.MoveRobot(robot, endMoveMid,false);
             obj.MoveRobot(robot, obj.ready, true);
         end
         
@@ -195,8 +201,10 @@ classdef ChessController < handle
                 end
             end
             if obj.realControl
-               obj.rosCont.SetGoal(3,goalTraj(end,:),0)
-               obj.rosCont.doGoal()
+                if obj.turn == 1
+                    obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                    obj.rosCont.doGoal()
+                end
             end
         end
     end
