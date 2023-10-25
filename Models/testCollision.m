@@ -1,6 +1,8 @@
 robot = omronTM5;
 [~, allLink] = robot.model.fkine(robot.model.getpos);
 
+
+
 tr = zeros(4,4,robot.model.n+1);
 tr(:,:,1) = robot.model.base;
 q = robot.model.getpos;
@@ -12,26 +14,22 @@ end
 centrePoint = zeros(robot.model.n,3);
 radii = zeros(robot.model.n,3);
 for i = 1:robot.model.n
-    x = abs(tr(1,4,i)-tr(1,4,i+1))/2;
-    y = abs(tr(2,4,i)-tr(2,4,i+1))/2;
-    z = abs(tr(3,4,i)-tr(3,4,i+1))/2;
+    x = abs(tr(1,4,i)-tr(1,4,i+1))/2 + 0.1;
+    y = abs(tr(2,4,i)-tr(2,4,i+1))/2 + 0.1;
+    z = abs(tr(3,4,i)-tr(3,4,i+1))/2 + 0.1;
 
     centrePoint(i,1) = -(tr(1,4,i+1)-tr(1,4,i))/2;
     centrePoint(i,2) = -(tr(2,4,i+1)-tr(2,4,i))/2;
-    centrePoint(i,3) = -(tr(3,4,i+1)-tr(3,4,i))/2; 
+    centrePoint(i,3) = (tr(3,4,i+1)-tr(3,4,i))/2; 
 
-    % centrePoint(i,1) = 0;
-    % centrePoint(i,2) = 0;
-    % centrePoint(i,3) = 0;
-
-    if x < 0.05
-        x = 0.05;
+    if x < 0.1
+        x = 0.1;
     end
-    if y < 0.05
-        y = 0.05;
+    if y < 0.1
+        y = 0.1;
     end
-    if z < 0.05
-        z = 0.05;
+    if z < 0.1
+        z = 0.1;
     end
     radii(i,1) = x;
     radii(i,2) = y;
@@ -48,7 +46,7 @@ for i = 1:robot.model.n
     % surf(X,Y,Z, 'FaceColor',[0,0,1], 'EdgeColor', 'none');
 end
 % workspace = [-1 1 -1 1 0 1];
-% robot.model.plot3d([0,0,0,0,0,0]);
+robot.model.plot3d([0,0,0,0,0,0]);
 axis equal
 view(3)
 robot.model.teach;
