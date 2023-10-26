@@ -154,7 +154,7 @@ classdef lightCurtain < handle
         %% Remove hand
         function resume = UnblockCurtain(self)
 
-            for i = self.currentIndex :0.005 : 0.2
+            for i = self.currentIndex :0.001 : 0.5
 
                 hold on
                 hand_pose = transl(i, 0, 0);
@@ -168,10 +168,10 @@ classdef lightCurtain < handle
                 resume = self.check;
                 if self.check == 0
 
-                    resumeMessage = sprintf('Resume: Curtain plane has been unbroken');
-                    disp(resumeMessage) % display status to command window for log
-                    stopMessage_text = text(0, 1, 1, resumeMessage); % display status in the figure
-                    
+                    stopMessage = sprintf('Resume: Curtain plane has been unbroken');
+                    disp(stopMessage) % display status to command window for log
+                    stopMessage_text = text(0, 1, 1, stopMessage); % display status in the figure
+                    break
                 end
             end
         end
