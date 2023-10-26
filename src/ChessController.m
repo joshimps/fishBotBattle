@@ -2,10 +2,6 @@ classdef ChessController < handle
     %CHESSCONTROLLER Summary of this class goes here
     %   Detailed explanation goes here
     %% TODO
-    % PVE mode needs to be split into pve sim and pve real and 
-    % pieces moved automatically
-    % ur3 cant reach the last row of the board, may need to elevate it
-    % add more waypoints directly above picking and placing to prevent clipping
     % add gripper control
     
     properties
@@ -18,64 +14,71 @@ classdef ChessController < handle
         turn;
         rosCont; 
         realControl; 
+        safetyWait;
     end
     
     methods
-        function obj = ChessController(eve, realControl)
-            if nargin < 2
-                eve = 1;
+        function obj = ChessController(realControl)
+            if nargin < 1
                 realControl = 0;
             end
+            obj.safetyWait = 0;
             obj.turn = 0;  
-            obj.sim = IRsim(eve);
+            obj.sim = IRsim();
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
-            if eve
-                obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
-            end
+            obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
             obj.realControl = realControl;
-            % obj.rosCont.Connect(realControl); 
         end
 
         function chessGameEvE(obj)
-           prevMove = 'e2e4,0,0';
-           obj.interpMoveString(prevMove);
-           gameIsOver = 0; 
-           while ~gameIsOver
-               newMove = obj.rosCont.getMove(prevMove(1:4));
-               if size(newMove.Move,2) < 1
-                   gameIsOver = true;
-               end
-               obj.interpMoveString(newMove.Move);
-               prevMove = newMove.Move;
-           end
-           disp("Game is over, winner is " + ~obj.turn);
+            obj.realControl = 0; 
+            obj.rosCont.Connect(0); 
+            prevMove = 'e2e4,0,0';
+            obj.interpMoveString(prevMove);
+            gameIsOver = 0; 
+            while ~gameIsOver
+                newMove = obj.rosCont.getMove(prevMove(1:4));
+                if size(newMove.Move,2) < 1
+                    gameIsOver = true;
+                end
+                if size(newMove,2) < 1
+                    break;
+                else
+                    obj.interpMoveString(newMove.Move);
+                    prevMove = newMove.Move;
+                end
+            end
+            disp("Game is over, winner is " + ~obj.turn);
         end
 
-        function chessGamePvE(obj)
-           prevMove = 'e2e4,0,0';
-           obj.interpMoveString(prevMove);
-           gameIsOver = 0; 
-           while ~gameIsOver
-               if obj.turn == 0
-                   engineMove = obj.rosCont.getMove(prevMove(1:4));
-                   newMove = engineMove.move;
-               else
-                   newMove = input("Enter Player Prompt", 's');
-               end
-                   
-               if size(newMove,2) < 1
-                   gameIsOver = true;
-               
-               else
-                obj.interpMoveString(newMove);
-                prevMove = newMove;
-               end
-           end
-           disp("Game is over, winner is " + ~obj.turn);
-           end
+        function chessGamePvE(obj, realControl);
+            obj.rosCont.Connect(realControl); 
+            obj.realControl = realControl; 
+            disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
+            newMove = input("Enter Move: ", 's');
+            prevMove = newMove; 
+            obj.interpMoveString(newMove);
+            while true
+                if obj.turn == 1
+                    engineMove = obj.rosCont.getMove(prevMove(1:4));
+                    newMove = engineMove.Move;
+                else
+                    obj.rosCont.getMove(prevMove(1:4));
+                    newMove = input("Enter Move: ", 's');
+                end
+                    
+                if size(newMove,2) < 1
+                    break;
+                else
+                    obj.interpMoveString(newMove);
+                    prevMove = newMove;
+                end
+            end
+            disp("Game is over, winner is " + ~obj.turn);
+        end
 
-        %castles and promotes not implemented yet
+        %promotes not implemented yet
         function interpMoveString(obj, moveString)
             disp(moveString);
             Alphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -85,11 +88,6 @@ classdef ChessController < handle
             piece = obj.sim.board.posGrid{str2double(moveString(2)),nums(1)}.piece;
             capture = str2double(moveString(6));
             castling = str2double(moveString(8));
-            %promotion = 0; 
-            %if length(moveString)>8
-            %    promotion = moveString(10);
-            %    update piece ply file
-            %end
             if obj.turn == 0
                 robot = obj.sim.ur;
                 obj.ready = obj.urReadyPose;
@@ -157,9 +155,8 @@ classdef ChessController < handle
         % Will stop and log a message if a collision is projected in the
         % next movement. Will move brick with end effector if a brick is
         % passed in as an argument.
-        function stop = MoveRobot(obj, robot, goalPose, isJoint, piece)
+        function MoveRobot(obj, robot, goalPose, isJoint, piece)
             movePiece = true;
-            stop = false;
             if  nargin < 5
                 movePiece = false;
             end
@@ -171,23 +168,34 @@ classdef ChessController < handle
                 qGoal = goalPose;
             end
             goalTraj = jtraj(curQ,qGoal, 50);
-            
-            for i = 1:size(goalTraj, 1)
-                qState = goalTraj(i,:);
 
-                % collision detection based on (Paul, G. Aug 2023)
-                % [~, allLink] = self.robot.model.fkine(qState);
-                % for j = 2:(size(allLink,2)-1)
-                %     [~,check] = LinePlaneIntersection(self.baseNormal,self.basePlane,allLink(j).t',allLink(j+1).t');
-                %     if check == 1
-                %         stop = true;
-                %         disp("COLLISION PREDICTED IN MOTION PLAN - ABORTING")
-                %         break;
-                %     end
-                % end
-                % if stop == true
-                %     break
-                % end
+            if obj.realControl
+                if obj.turn == 1
+                    obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                    p = parfeval(backgroundPool, @obj.rosCont.doGoal);
+                end
+            end
+            
+            i = 1;
+            while i < size(goalTraj, 1)
+                temp = obj.pollSafety();
+                if temp == 0
+                    if obj.safetyWait == 1
+                        if obj.realControl == 1
+                            if obj.turn == 1
+                                obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                                p = parfeval(@obj.rosCont.doGoal);
+                            end
+                        end
+                    end
+                    obj.safetyWait = temp;
+                end
+                if obj.safetyWait == 1
+                    cancel(p);
+                    obj.rosCont.cancelGoal()
+                    continue
+                end
+                qState = goalTraj(i,:);
 
                 % move robot, gripper and, if applicable, the brick
                 robot.model.animate(qState);
@@ -199,13 +207,19 @@ classdef ChessController < handle
                     piece.base = eePose.T * troty(pi);
                     piece.animate(0);
                 end
+                i = i + 1; 
             end
             if obj.realControl
-                if obj.turn == 1
-                    obj.rosCont.SetGoal(3,goalTraj(end,:),0)
-                    obj.rosCont.doGoal()
-                end
+                wait(p);
             end
+
+        end
+
+        function wait = pollSafety(obj)
+            % Call collision poll
+            % Call estop poll
+            % Call light curtain poll
+            wait = false;
         end
     end
 end

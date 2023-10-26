@@ -22,10 +22,9 @@ classdef IRsim < handle
 
     methods
         %% ...structors
-        function self = IRsim(mode,baseTr)
-            if nargin < 2
+        function self = IRsim(baseTr)
+            if nargin < 1
                 baseTr = eye(4);
-                mode = 1;
             end
 
             hold on
@@ -33,16 +32,14 @@ classdef IRsim < handle
             
             ur_tr = baseTr * transl(-0.15, 0.25, 0);
             omron_tr = baseTr * transl(0.75,0.25,0.1);
-            curtain_tr = baseTr * transl(0.7, 0.25, 0);
+            curtain_tr = baseTr * transl(0.25, -0.2, 0) * troty(pi/2);
 
             self.ur = ur3(ur_tr);
-            if mode == 0
-                self.environment = PlaceObject('robotRoom_PvE.ply', [0 0 0]);
-                self.curtain = lightCurtain(curtain_tr);
-            else
-                self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
-                self.tm5 = omronTM5(omron_tr);
-            end
+                
+            self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
+            self.tm5 = omronTM5(omron_tr);
+            %self.curtain = lightCurtain(curtain_tr);
+            
             self.board = ChessBoard();            
             
       
