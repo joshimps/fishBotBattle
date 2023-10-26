@@ -6,6 +6,9 @@ import chess
 import chess.svg
 from chess import engine
 from fishbot_ros.srv import chess_service, chess_serviceRequest, chess_serviceResponse
+from tmr_ros1.srv import SendScript
+from std_srvs.srv import Trigger, TriggerResponse
+
 
 fish_path = rospy.get_param("/stockfish_file_path")
 fish_diff = rospy.get_param("/stockfish_difficulty", default=20)
@@ -14,6 +17,8 @@ board = chess.Board()
 fish = engine.SimpleEngine.popen_uci(fish_path)
 fish.configure({"Skill Level":fish_diff})
 time_limit = chess.engine.Limit(time = 0.1)
+states = ["Open", "Closed"]
+state = 0
 
 
 def chessCallback(req):
@@ -34,14 +39,22 @@ def chessCallback(req):
         return chess_serviceResponse(result)
     else: return chess_serviceResponse("")
 
+def gripperCallback():
+    msg = SendScript()
+    msg.request.id = "Exit Listener"
+    msg.request.script = "ScriptExit()"
+    grip(msg)
+    string = "Gripper is now " + states[state]
+    state != state
+    return TriggerResponse(success=True, Message=string)
 
 
 if __name__ == "__main__":
-    try:
-        rospy.init_node("Chess_Engine")
-        rospy.loginfo("Starting Chess Engine")
-        serv = rospy.Service('chess_service', chess_service, chessCallback)
-        rospy.loginfo("Chess Engine Ready")
-        rospy.spin()
-    except rospy.ROSInterruptException:
+    rospy.init_node("Chess_Engine")
+    rospy.loginfo("Starting Chess Engine")
+    serv = rospy.Service('chess_service', chess_service, chessCallback)
+    gripListen = rospy.Service('gripper_serv', Trigger, gripperCallback)
+    grip = rospy.ServiceProxy('tm_driver/send_script', SendScript)
+    rospy.loginfo("Chess Engine Ready")
+    while not rospy.is_shutdown():
         pass

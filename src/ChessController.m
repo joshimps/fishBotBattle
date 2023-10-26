@@ -1,4 +1,4 @@
-classdef ChessController < handle
+ classdef ChessController < handle
     %CHESSCONTROLLER Summary of this class goes here
     %   Detailed explanation goes here
     %% TODO
