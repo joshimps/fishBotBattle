@@ -74,6 +74,9 @@ classdef RosController < handle
             sendGoalAndWait(self.controlClient,self.goal);
             self.currentJointState_123456 = self.nextJointState;
         end
-
+        
+        function cancelGoal(self)
+            cancelGoal(self.controlClient);
+        end
     end  
 end
