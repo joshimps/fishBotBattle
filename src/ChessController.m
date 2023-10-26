@@ -170,7 +170,15 @@
 
             if obj.realControl
                 if obj.turn == 1
-                    obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                    goal = goalTraj(end,:) + [180,0,0,-90,0,0];
+                    goal(3) = goal(3)*-1;
+                    if goal(1) > 180
+                        goal(1) = goal(1) - 360; 
+                    end
+                    if goal(4) < -180
+                        goal(4) = goal(4) + 360
+                    end
+                    obj.rosCont.SetGoal(3,goal,0)
                     p = parfeval(backgroundPool, @obj.rosCont.doGoal);
                 end
             end
@@ -182,7 +190,15 @@
                     if obj.safetyWait == 1
                         if obj.realControl == 1
                             if obj.turn == 1
-                                obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                                goal = goalTraj(end,:) + [180,0,0,-90,0,0];
+                                if goal(1) > 180
+                                    goal(1) = goal(1) - 360; 
+                                end
+                                if goal(4) < -180
+                                    goal(4) = goal(4) + 360
+                                end
+                                goal(3) = goal(3)*-1;
+                                obj.rosCont.SetGoal(3,goal,0)
                                 p = parfeval(@obj.rosCont.doGoal);
                             end
                         end

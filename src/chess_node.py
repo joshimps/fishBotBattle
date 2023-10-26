@@ -6,7 +6,7 @@ import chess
 import chess.svg
 from chess import engine
 from fishbot_ros.srv import chess_service, chess_serviceRequest, chess_serviceResponse
-from tmr_ros1.srv import SendScript
+from tm_msgs.srv import SendScript, SendScriptRequest
 from std_srvs.srv import Trigger, TriggerResponse
 
 
@@ -39,14 +39,14 @@ def chessCallback(req):
         return chess_serviceResponse(result)
     else: return chess_serviceResponse("")
 
-def gripperCallback():
-    msg = SendScript()
-    msg.request.id = "Exit Listener"
-    msg.request.script = "ScriptExit()"
+def gripperCallback(req):
+    msg = SendScriptRequest()
+    msg.id = 'Exit Listener'
+    msg.script = 'ScriptExit()'
     grip(msg)
-    string = "Gripper is now " + states[state]
+    foo = "Gripper is now " + states[state]
     state != state
-    return TriggerResponse(success=True, Message=string)
+    return TriggerResponse(success=True, message=foo)
 
 
 if __name__ == "__main__":
