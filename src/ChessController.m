@@ -15,6 +15,7 @@ classdef ChessController < handle
         rosCont; 
         realControl; 
         safetyWait;
+        newMove;
     end
     
     methods
@@ -56,7 +57,6 @@ classdef ChessController < handle
             obj.rosCont.Connect(realControl); 
             obj.realControl = realControl; 
             disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
-            newMove = input("Enter Move: ", 's');
             prevMove = newMove; 
             obj.interpMoveString(newMove);
             while true
@@ -65,7 +65,6 @@ classdef ChessController < handle
                     newMove = engineMove.Move;
                 else
                     obj.rosCont.getMove(prevMove(1:4));
-                    newMove = input("Enter Move: ", 's');
                 end
                     
                 if size(newMove,2) < 1
