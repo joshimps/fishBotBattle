@@ -7,6 +7,7 @@ classdef RosController < handle
         jointNames;
         controlClient;
         goal;
+        gripperClient; 
         seq;
         chessClient;
         chessMove; 
@@ -34,12 +35,18 @@ classdef RosController < handle
     
                 [self.controlClient, self.goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
                 self.seq = 1; 
+
+                [self.gripperClient] = rossvcclient('/gripper_serv', 'std_srvs/trigger');
             end
         end
 
         function [recMove] = getMove(self,sendMove)
             self.chessMove.PrevMove = sendMove;
             recMove = call(self.chessClient, self.chessMove);
+        end
+
+        function actuate_gripper(self)
+            call(self.gripperClient);
         end
 
         function SetGoal(self, duration, joints, reset)
