@@ -29,51 +29,54 @@ classdef ChessController < handle
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
             obj.realControl = realControl;
-            % obj.rosCont.Connect(realControl); 
         end
 
         function chessGameEvE(obj)
-           prevMove = 'e2e4,0,0';
-           obj.interpMoveString(prevMove);
-           gameIsOver = 0; 
-           while ~gameIsOver
-               newMove = obj.rosCont.getMove(prevMove(1:4));
-               if size(newMove.Move,2) < 1
-                   gameIsOver = true;
-               end
-               if size(newMove,2) < 1
-                   break;
-               else
-                   obj.interpMoveString(newMove.Move);
-                   prevMove = newMove.Move;
-               end
-           end
-           disp("Game is over, winner is " + ~obj.turn);
+            obj.realControl = 0; 
+            obj.rosCont.Connect(0); 
+            prevMove = 'e2e4,0,0';
+            obj.interpMoveString(prevMove);
+            gameIsOver = 0; 
+            while ~gameIsOver
+                newMove = obj.rosCont.getMove(prevMove(1:4));
+                if size(newMove.Move,2) < 1
+                    gameIsOver = true;
+                end
+                if size(newMove,2) < 1
+                    break;
+                else
+                    obj.interpMoveString(newMove.Move);
+                    prevMove = newMove.Move;
+                end
+            end
+            disp("Game is over, winner is " + ~obj.turn);
         end
 
-        function chessGamePvE(obj)
-                   disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
-                   newMove = input("Enter Move: ", 's');
-                   prevMove = newMove; 
-                   obj.interpMoveString(newMove);
-           while true
-               if obj.turn == 1
-                   engineMove = obj.rosCont.getMove(prevMove(1:4));
-                   newMove = engineMove.Move;
-               else
-                   obj.rosCont.getMove(prevMove(1:4));
-                   newMove = input("Enter Move: ", 's');
-               end
-                   
-               if size(newMove,2) < 1
-                   break;
-               else
-                obj.interpMoveString(newMove);
-                prevMove = newMove;
-               end
-           end
-           disp("Game is over, winner is " + ~obj.turn);
-           end
+        function chessGamePvE(obj, realControl);
+            obj.rosCont.Connect(realControl); 
+            obj.realControl = realControl; 
+            disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
+            newMove = input("Enter Move: ", 's');
+            prevMove = newMove; 
+            obj.interpMoveString(newMove);
+            while true
+                if obj.turn == 1
+                    engineMove = obj.rosCont.getMove(prevMove(1:4));
+                    newMove = engineMove.Move;
+                else
+                    obj.rosCont.getMove(prevMove(1:4));
+                    newMove = input("Enter Move: ", 's');
+                end
+                    
+                if size(newMove,2) < 1
+                    break;
+                else
+                    obj.interpMoveString(newMove);
+                    prevMove = newMove;
+                end
+            end
+            disp("Game is over, winner is " + ~obj.turn);
+        end
 
         %promotes not implemented yet
         function interpMoveString(obj, moveString)
