@@ -8,8 +8,8 @@
         sim;
         urReadyPose = [0, -1.1, -2, -1.5, 1.8,0];
         urWaitPose = [0 -0.25 -2.4 -0.4 1.8 0];
-        tmReadyPose = [pi, -0.17, 1.9, 0.129, -1.5,0];
-        tmWaitPose = [pi, -0.67, 1.9, -0.28, -1.5,0];
+        tmReadyPose = [0, 1.4, 1.9, -1.7, -1.5,0];
+        tmWaitPose = [0, 0.9, 1.9, -1.85, -1.5,0];
         ready = [];
         turn;
         rosCont; 
@@ -130,14 +130,18 @@
 
         function movePiece(obj, robot, startMove, endMove, piece)
             obj.MoveRobot(robot, obj.ready, true);
-            startMoveMid = startMove * transl(0,0,-0.225);
+            startMoveReady = startMove * transl(0,0,-0.3);
+            obj.MoveRobot(robot, startMoveReady, false);
+            startMoveMid = startMoveReady * transl(0,0,0.075);
             obj.MoveRobot(robot, startMoveMid, false);
             startMovePick = startMoveMid * transl(0,0,0.07);
             obj.MoveRobot(robot, startMovePick, false);
             robot.gripper.Close();
             obj.MoveRobot(robot, startMoveMid, false, piece);
             obj.MoveRobot(robot, obj.ready, true, piece);
-            endMoveMid = endMove * transl(0,0,-0.23);
+            endMoveReady = endMove * transl(0,0,-0.3);
+            obj.MoveRobot(robot, endMoveReady, false, piece);
+            endMoveMid = endMoveReady * transl(0,0,0.07);
             obj.MoveRobot(robot, endMoveMid, false,piece);
             endMovePlace = endMoveMid * transl(0,0,0.079);
             obj.MoveRobot(robot, endMovePlace, false, piece);

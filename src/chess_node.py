@@ -41,7 +41,7 @@ def chessCallback(req):
 
 def gripperCallback(req):
     msg = SendScriptRequest()
-    msg.id = 'ExitListener'
+    msg.id = 'Exit Listener'
     msg.script = 'ScriptExit()'
     grip(msg)
     foo = "Gripper is now " + states[state]
