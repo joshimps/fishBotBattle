@@ -5,6 +5,8 @@ function [collision] = checkCollision(robot, qmatrix, object, translation)
         translation = [0 0 0];
     end
 
+    collision = 0;
+
     objectPoints = object + repmat(translation,size(object,1),1);
     
 
@@ -57,10 +59,11 @@ function [collision] = checkCollision(robot, qmatrix, object, translation)
                 disp(['q line: ', num2str(a)])
                 disp(['q matrix: ', num2str(q)])
                 disp(['link: ', num2str(k)])
+                pause(1)
                 
                 return
             end
-            disp(['There are ', num2str(size(pointsInside,1)),' points inside the ',num2str(k),'th ellipsoid of the ', num2str(a), 'q values']);
+            % disp(['There are ', num2str(size(pointsInside,1)),' points inside the ',num2str(k),'th ellipsoid of the ', num2str(a), 'q values']);
         end
     end
 

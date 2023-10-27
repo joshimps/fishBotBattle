@@ -1,19 +1,19 @@
 robot = omronTM5;
 [~, allLink] = robot.model.fkine(robot.model.getpos);
 
-
-
-tr = zeros(4,4,robot.model.n+1);
+tr = zeros(4,4,robot.model.n+2);
 tr(:,:,1) = robot.model.base;
-q = robot.model.getpos;
+q = [0 0 0 0 0 0];
 
 L = robot.model.links;
 for i = 1 : robot.model.n
     tr(:,:,i+1) = tr(:,:,i) * trotz(q(i)) * transl(0,0,L(i).d) * transl(L(i).a,0,0) * trotx(L(i).alpha);
 end
-centrePoint = zeros(robot.model.n,3);
+    tr(:,:,robot.model.n+2) = tr(:,:,robot.model.n) * trotz(q(robot.model.n)) * transl(0,0,L(robot.model.n).d+0.05) * transl(L(robot.model.n).a,0,0) * trotx(L(robot.model.n).alpha);
+
+    centrePoint = zeros(robot.model.n,3);
 radii = zeros(robot.model.n,3);
-for i = 1:robot.model.n
+for i = 1:robot.model.n+1
     x = abs(tr(1,4,i)-tr(1,4,i+1))/2 + 0.1;
     y = abs(tr(2,4,i)-tr(2,4,i+1))/2 + 0.1;
     z = abs(tr(3,4,i)-tr(3,4,i+1))/2 + 0.1;
@@ -31,12 +31,13 @@ for i = 1:robot.model.n
     if z < 0.1
         z = 0.1;
     end
+
     radii(i,1) = x;
     radii(i,2) = y;
     radii(i,3) = z;
 end
 hold on
-for i = 1:robot.model.n
+for i = 1:robot.model.n+1
     
     [X,Y,Z] = ellipsoid(centrePoint(i,1), centrePoint(i,2), centrePoint(i,3), radii(i,1), radii(i,2), radii(i,3), 20);
     robot.model.points{i+1} = [X(:),Y(:),Z(:)];
