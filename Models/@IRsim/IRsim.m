@@ -13,10 +13,8 @@ classdef IRsim < handle
         mode;
         world_offset;
         environment;
-        curtain;
-        omron_stand;
-        bucket0;
-        bucket1;
+        curtain;        
+        box_vertices;
 
     end
 
@@ -26,33 +24,33 @@ classdef IRsim < handle
             if nargin < 1
                 baseTr = eye(4);
             end
-
-            hold on
+            
             view(3)
-            
-            ur_tr = baseTr * transl(-0.15, 0.25, 0);
-            omron_tr = baseTr * transl(0.75,0.25,0.1);
-            curtain_tr = baseTr * transl(0.25, -0.2, 0) * troty(pi/2);
-
-            self.ur = ur3(ur_tr);
-                
-            self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
-            self.tm5 = omronTM5(omron_tr);
-            %self.curtain = lightCurtain(curtain_tr);
-            
-            self.board = ChessBoard();            
-            
-      
-
+            hold on
             %place the floor into the world.
             surf([-5,-5; 5,5] ...
                 ,[-5,5;-5,5] ...
                 ,[-0.8,-0.8;-0.8,-0.8] ...
                 ,'CData',imread('concrete.jpg') ...
                 ,'FaceColor','texturemap');
+            
+            ur_tr = baseTr * transl(-0.15, 0.25, 0);
+            omron_tr = baseTr * transl(0.75,0.25,0.1);
+            curtain_tr = baseTr * transl(0.25, -0.5, 0) * troty(pi/2);
 
+            self.ur = ur3(ur_tr);
+                
+            self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
+            self.tm5 = omronTM5(omron_tr);
+            self.curtain = lightCurtain(curtain_tr);
+            
+            self.board = ChessBoard();
+
+            self.box_vertices = collisionBlock();
+        
+            axis off
             view(3)
-            axis([-1 1.25 -1 1 -0.1 1.5])
+            % axis([-1 1.25 -1 1 -0.1 1.5])
             
             end
     end

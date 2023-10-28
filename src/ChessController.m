@@ -1,4 +1,4 @@
-classdef ChessController < handle
+ classdef ChessController < handle
     %CHESSCONTROLLER Summary of this class goes here
     %   Detailed explanation goes here
     %% TODO
@@ -8,8 +8,8 @@ classdef ChessController < handle
         sim;
         urReadyPose = [0, -1.1, -2, -1.5, 1.8,0];
         urWaitPose = [0 -0.25 -2.4 -0.4 1.8 0];
-        tmReadyPose = [0, 1.4, 1.9, -1.7, -1.5,0];
-        tmWaitPose = [0, 0.9, 1.9, -1.85, -1.5,0];
+        tmReadyPose = [pi, -0.17, 1.9, 0.129, -1.5,0];
+        tmWaitPose = [pi, -0.67, 1.9, -0.28, -1.5,0];
         ready = [];
         turn;
         rosCont; 
@@ -130,18 +130,14 @@ classdef ChessController < handle
 
         function movePiece(obj, robot, startMove, endMove, piece)
             obj.MoveRobot(robot, obj.ready, true);
-            startMoveReady = startMove * transl(0,0,-0.3);
-            obj.MoveRobot(robot, startMoveReady, false);
-            startMoveMid = startMoveReady * transl(0,0,0.075);
+            startMoveMid = startMove * transl(0,0,-0.225);
             obj.MoveRobot(robot, startMoveMid, false);
             startMovePick = startMoveMid * transl(0,0,0.07);
             obj.MoveRobot(robot, startMovePick, false);
             robot.gripper.Close();
             obj.MoveRobot(robot, startMoveMid, false, piece);
             obj.MoveRobot(robot, obj.ready, true, piece);
-            endMoveReady = endMove * transl(0,0,-0.3);
-            obj.MoveRobot(robot, endMoveReady, false, piece);
-            endMoveMid = endMoveReady * transl(0,0,0.07);
+            endMoveMid = endMove * transl(0,0,-0.23);
             obj.MoveRobot(robot, endMoveMid, false,piece);
             endMovePlace = endMoveMid * transl(0,0,0.079);
             obj.MoveRobot(robot, endMovePlace, false, piece);
@@ -170,7 +166,15 @@ classdef ChessController < handle
 
             if obj.realControl
                 if obj.turn == 1
-                    obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                    goal = goalTraj(end,:) + [180,0,0,-90,0,0];
+                    goal(3) = goal(3)*-1;
+                    if goal(1) > 180
+                        goal(1) = goal(1) - 360; 
+                    end
+                    if goal(4) < -180
+                        goal(4) = goal(4) + 360
+                    end
+                    obj.rosCont.SetGoal(3,goal,0)
                     p = parfeval(backgroundPool, @obj.rosCont.doGoal);
                 end
             end
@@ -182,7 +186,15 @@ classdef ChessController < handle
                     if obj.safetyWait == 1
                         if obj.realControl == 1
                             if obj.turn == 1
-                                obj.rosCont.SetGoal(3,goalTraj(end,:),0)
+                                goal = goalTraj(end,:) + [180,0,0,-90,0,0];
+                                if goal(1) > 180
+                                    goal(1) = goal(1) - 360; 
+                                end
+                                if goal(4) < -180
+                                    goal(4) = goal(4) + 360
+                                end
+                                goal(3) = goal(3)*-1;
+                                obj.rosCont.SetGoal(3,goal,0)
                                 p = parfeval(@obj.rosCont.doGoal);
                             end
                         end

@@ -22,17 +22,16 @@ classdef RosController < handle
                 rosshutdown
             end
             rosinit(default_ip)
-            [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
+            %[self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
             
             if real_control == 1
                 self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
     
                 pause(2); % Pause to give time for a message to appear
-                currentJointState_321456 = (self.jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
-                self.currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
-                self.jointNames = {'shoulder_pan_joint','shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
+                self.currentJointState_123456 = (self.jointStateSubscriber.LatestMessage.Position)';
+                self.jointNames = {'shoulder_1_joint','shoulder_2_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
     
-                [self.controlClient, self.goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
+                [self.controlClient, self.goal] = rosactionclient('/follow_joint_trajectory');
                 self.seq = 1; 
             end
         end
@@ -42,6 +41,11 @@ classdef RosController < handle
             recMove = call(self.chessClient, self.chessMove);
         end
 
+        function actuate_gripper(self)
+            gripperClient = rossvcclient('/gripper_serv', 'std_srvs/Trigger');
+            resp = call(gripperClient);
+        end
+
         function SetGoal(self, duration, joints, reset)
             self.goal.Trajectory.JointNames = self.jointNames;
             self.seq = self.seq + 1; 
@@ -49,20 +53,21 @@ classdef RosController < handle
             self.goal.Trajectory.Header.Stamp = rostime('Now','system');
             self.goal.GoalTimeTolerance = rosduration(0.5);
             bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
-           
+            
             if reset == 1
-                currentJointState_321456 = (self.jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
-                self.currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
+                self.currentJointState_123456 = (self.jointStateSubscriber.LatestMessage.Position)';
             end
             
-
+             
             startJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
             startJointSend.Positions = self.currentJointState_123456;
+            startJointSend.Velocities = zeros(1,6);
             startJointSend.TimeFromStart = rosduration(0);    
             
             endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
             self.nextJointState = joints;
             endJointSend.Positions = joints;
+            endJointSend.Velocities = zeros(1,6);
             endJointSend.TimeFromStart = rosduration(duration);
 
             self.goal.Trajectory.Points = [startJointSend; endJointSend];

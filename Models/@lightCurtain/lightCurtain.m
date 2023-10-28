@@ -6,6 +6,10 @@ classdef lightCurtain < handle
     %#ok<*TRYNC>
 
     properties
+        check;
+    end
+
+    properties (Access=private)
         curtain1;
         curtain2;
         x;
@@ -21,12 +25,12 @@ classdef lightCurtain < handle
         vertex;
         handVertexCount;
         handMesh_h;
-        Vertices;
-        check;
+        Vertices;   
         currentIndex;
-
-
+        figure_message;
     end
+
+   
 
     methods
         %% ...structors
@@ -62,8 +66,8 @@ classdef lightCurtain < handle
             self.bottomLeft = [self.x self.y_min 0];
             self.topRight = [self.x self.y_max 1];
 
-            curtain1 = PlaceObject('lightCurtain.ply', [self.x self.y_min-0.01 0]);
-            curtain2 = PlaceObject('lightCurtain.ply', [self.x self.y_max 0]);
+            self.curtain1 = PlaceObject('lightCurtain.ply', [self.x self.y_min-0.01 0]);
+            self.curtain2 = PlaceObject('lightCurtain.ply', [self.x self.y_max 0]);
 
             laserNormals = [self.bottomLeft(1)-self.topRight(1), self.bottomLeft(2)-self.topRight(2), 0];
             laserCenters = 0.05;
@@ -146,13 +150,15 @@ classdef lightCurtain < handle
                     self.currentIndex = i;
                     stopMessage = sprintf('STOP: Curtain plane has been broken');
                     disp(stopMessage) % display status to command window for log
-                    stopMessage_text = text(0, 1, 1, stopMessage); % display status in the figure
+                    self.figure_message = text(0, 1, 1, stopMessage); % display status in the figure
                     break
                 end
             end
         end
         %% Remove hand
         function resume = UnblockCurtain(self)
+
+            resume = 0;
 
             for i = self.currentIndex :0.005 : 0.2
 
@@ -170,7 +176,10 @@ classdef lightCurtain < handle
 
                     resumeMessage = sprintf('Resume: Curtain plane has been unbroken');
                     disp(resumeMessage) % display status to command window for log
-                    stopMessage_text = text(0, 1, 1, resumeMessage); % display status in the figure
+                    delete(self.figure_message);
+                    self.figure_message = text(0, 1, 1, resumeMessage); % display status in the figure
+                    resume = 1;
+                    return;
                     
                 end
             end
