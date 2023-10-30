@@ -56,4 +56,3 @@ classdef IRsim < handle
     end
     
 end
-
