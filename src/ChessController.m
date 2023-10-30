@@ -217,16 +217,15 @@
         end
 
         function r = getRealEStop(obj)
-            arduinoObj.UserData = struct("Data",[],"Count",1);
-            data = readline(arduinoObj)
-            arduinoObj.UserData.Data(end+1) = data;
-            arduinoObj.UserData.Count = arduinoObj.UserData.Count + 1;
-            display(data)
+            obj.arduinoObj.UserData = struct("Data",[]);
+            data = readline(obj.arduinoObj)
+            obj.eStopOn = str2double(data)
         end
      
         function safetyWait = pollSafety(obj)
             % Call collision poll
             % Call estop poll
+            getRealEStop()
             if obj.eStopOn
                 safetyWait = 1;
             end
