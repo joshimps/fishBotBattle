@@ -1,4 +1,4 @@
-robot = omronTM5;
+robot = ur3;
 [~, allLink] = robot.model.fkine(robot.model.getpos);
 
 tr = zeros(4,4,robot.model.n+2);

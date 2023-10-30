@@ -54,16 +54,9 @@ function [collision] = checkCollision(robot, qmatrix, object, translation)
             algebraicDist = GetAlgebraicDist(updatedObjectPoints, centrePoint, radii);
             pointsInside = find(algebraicDist < 1);
             if pointsInside > 0
-                collision = 1;
-               
-                disp(['q line: ', num2str(a)])
-                disp(['q matrix: ', num2str(q)])
-                disp(['link: ', num2str(k)])
-                pause(1)
-                
+                collision = 1;        
                 return
             end
-            % disp(['There are ', num2str(size(pointsInside,1)),' points inside the ',num2str(k),'th ellipsoid of the ', num2str(a), 'q values']);
         end
     end
 
