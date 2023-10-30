@@ -134,7 +134,9 @@
 
         function movePiece(obj, robot, startMove, endMove, piece)
             obj.MoveRobot(robot, obj.ready, true);
-            startMoveMid = startMove * transl(0,0,-0.225);
+            startMoveReady = startMove * transl(0,0,-0.3);
+            obj.MoveRobot(robot, startMoveReady, false);
+            startMoveMid = startMoveReady * transl(0,0,0.075);
             obj.MoveRobot(robot, startMoveMid, false);
             startMovePick = startMoveMid * transl(0,0,0.07);
             obj.MoveRobot(robot, startMovePick, false);
@@ -144,7 +146,9 @@
             end
             obj.MoveRobot(robot, startMoveMid, false, piece);
             obj.MoveRobot(robot, obj.ready, true, piece);
-            endMoveMid = endMove * transl(0,0,-0.23);
+            endMoveReady = endMove * transl(0,0,-0.3);
+            obj.MoveRobot(robot, endMoveReady, false, piece);
+            endMoveMid = endMoveReady * transl(0,0,0.07);
             obj.MoveRobot(robot, endMoveMid, false,piece);
             endMovePlace = endMoveMid * transl(0,0,0.079);
             obj.MoveRobot(robot, endMovePlace, false, piece);
@@ -177,7 +181,7 @@
             i = 1;
             while i < size(goalTraj, 1)
                 wait(0.001);
-                if obj.pollSafety() == 1
+                if obj.pollSafety(robot, goalTraj(i,:)) == 1
                     continue; 
                 end
                 qState = goalTraj(i,:);
@@ -222,14 +226,28 @@
             obj.eStopOn = str2double(data)
         end
      
-        function safetyWait = pollSafety(obj)
-            % Call collision poll
+        function safetyWait = pollSafety(robot, qmatrix)
+
+            safetyWait = 0;
+
             % Call estop poll
             getRealEStop()
             if obj.eStopOn
                 safetyWait = 1;
+                return;
             end
+
+            % Call collision poll
+            if checkCollision(robot, qmatrix, obj.sim.box.vertex)
+                safetyWait = 1;
+                return;
+            end
+     
             % Call light curtain poll
+            if obj.sim.curtain.checkCurtain()
+                safetyWait = 1;
+                return;
+            end
         end
 
     end

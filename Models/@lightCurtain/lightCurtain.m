@@ -7,6 +7,7 @@ classdef lightCurtain < handle
 
     properties
         check;
+
     end
 
     properties (Access=private)
@@ -25,12 +26,12 @@ classdef lightCurtain < handle
         vertex;
         handVertexCount;
         handMesh_h;
-        Vertices;   
+        Vertices;
         currentIndex;
         figure_message;
     end
 
-   
+
 
     methods
         %% ...structors
@@ -144,15 +145,15 @@ classdef lightCurtain < handle
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
                 pause(1)
 
-                self.check = self.checkCurtain(self.handVertexCount, self.vertex, self.topRight, self.bottomLeft);
-                stop = self.check;
-                if self.check == 1
-                    self.currentIndex = i;
-                    stopMessage = sprintf('STOP: Curtain plane has been broken');
-                    disp(stopMessage) % display status to command window for log
-                    self.figure_message = text(0, 1, 1, stopMessage); % display status in the figure
-                    break
-                end
+                % self.check = self.checkCurtain();
+                % stop = self.check;
+                % if self.check == 1
+                %     self.currentIndex = i;
+                %     stopMessage = sprintf('STOP: Curtain plane has been broken');
+                %     disp(stopMessage) % display status to command window for log
+                %     self.figure_message = text(0, 1, 1, stopMessage); % display status in the figure
+                %     break
+                % end
             end
         end
         %% Remove hand
@@ -170,37 +171,32 @@ classdef lightCurtain < handle
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
                 pause(1)
 
-                self.check = self.checkCurtain(self.handVertexCount, self.vertex, self.topRight, self.bottomLeft);
-                resume = self.check;
-                if self.check == 0
-
-                    resumeMessage = sprintf('Resume: Curtain plane has been unbroken');
-                    disp(resumeMessage) % display status to command window for log
-                    delete(self.figure_message);
-                    self.figure_message = text(0, 1, 1, resumeMessage); % display status in the figure
-                    resume = 1;
-                    return;
-                    
-                end
+                % self.check = self.checkCurtain();
+                % resume = self.check;
+                % if self.check == 0
+                % 
+                %     resumeMessage = sprintf('Resume: Curtain plane has been unbroken');
+                %     disp(resumeMessage) % display status to command window for log
+                %     delete(self.figure_message);
+                %     self.figure_message = text(0, 1, 1, resumeMessage); % display status in the figure
+                %     resume = 1;
+                %     return;
+                % 
+                % end
             end
         end
+        %%
 
 
-    end
-
-
-
-    methods(Static)
-
-        function check = checkCurtain(VertexCount, vertex, topRight, bottomLeft)
+        function check = checkCurtain(self)
 
             check = 0;
 
-            for j = 1 : VertexCount
-                if vertex(j,3) < topRight(3)
-                    if  vertex(j,1) < bottomLeft(1)
-                        if vertex(j,2) > bottomLeft(2)
-                            if vertex(j,2) < topRight(2)
+            for j = 1 : self.handVertexCount
+                if self.vertex(j,3) < self.topRight(3)
+                    if  self.vertex(j,1) < self.bottomLeft(1)
+                        if self.vertex(j,2) > self.bottomLeft(2)
+                            if self.vertex(j,2) < self.topRight(2)
                                 check = 1;
                                 return
                             end
@@ -209,7 +205,7 @@ classdef lightCurtain < handle
                 end
             end
         end
-
     end
+
 end
 

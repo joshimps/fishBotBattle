@@ -14,7 +14,7 @@ classdef IRsim < handle
         world_offset;
         environment;
         curtain;        
-        box_vertices;
+        box;
 
     end
 
@@ -46,7 +46,7 @@ classdef IRsim < handle
             
             self.board = ChessBoard();
 
-            self.box_vertices = collisionBlock();
+            self.box = collisionBlock();
         
             axis off
             view(3)
