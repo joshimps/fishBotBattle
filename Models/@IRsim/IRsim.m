@@ -14,7 +14,7 @@ classdef IRsim < handle
         world_offset;
         environment;
         curtain;        
-        box_vertices;
+        box;
 
     end
 
