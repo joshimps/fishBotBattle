@@ -46,7 +46,7 @@ classdef IRsim < handle
             
             self.board = ChessBoard();
 
-            self.box_vertices = collisionBlock();
+            self.box = collisionBlock();
         
             axis off
             view(3)
@@ -56,4 +56,3 @@ classdef IRsim < handle
     end
     
 end
-

@@ -1,4 +1,5 @@
 devel/
+config/
 logs/
 build/
 bin/
