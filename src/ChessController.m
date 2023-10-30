@@ -8,8 +8,8 @@
         sim;
         urReadyPose = [0, -1.1, -2, -1.5, 1.8,0];
         urWaitPose = [0 -0.25 -2.4 -0.4 1.8 0];
-        tmReadyPose = [pi, -0.17, 1.9, 0.129, -1.5,0];
-        tmWaitPose = [pi, -0.67, 1.9, -0.28, -1.5,0];
+        tmReadyPose = [-pi/2, -0.17, 1.9, 0.129, -1.5,0];
+        tmWaitPose = [-pi/2, -0.67, 1.9, -0.28, -1.5,0];
         ready = [];
         turn;
         rosCont; 
@@ -77,7 +77,6 @@
             disp("Game is over, winner is " + ~obj.turn);
         end
 
-        %promotes not implemented yet
         function interpMoveString(obj, moveString)
             disp(moveString);
             Alphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -135,6 +134,9 @@
             startMovePick = startMoveMid * transl(0,0,0.07);
             obj.MoveRobot(robot, startMovePick, false);
             robot.gripper.Close();
+            if obj.realControl
+                obj.rosCont.actuate_gripper();
+            end
             obj.MoveRobot(robot, startMoveMid, false, piece);
             obj.MoveRobot(robot, obj.ready, true, piece);
             endMoveMid = endMove * transl(0,0,-0.23);
@@ -142,6 +144,9 @@
             endMovePlace = endMoveMid * transl(0,0,0.079);
             obj.MoveRobot(robot, endMovePlace, false, piece);
             robot.gripper.Open();
+            if obj.realControl
+                obj.rosCont.actuate_gripper();
+            end
             obj.MoveRobot(robot, endMoveMid,false);
             obj.MoveRobot(robot, obj.ready, true);
         end
@@ -163,48 +168,12 @@
                 qGoal = goalPose;
             end
             goalTraj = jtraj(curQ,qGoal, 50);
-
-            if obj.realControl
-                if obj.turn == 1
-                    goal = goalTraj(end,:) + [180,0,0,-90,0,0];
-                    goal(3) = goal(3)*-1;
-                    if goal(1) > 180
-                        goal(1) = goal(1) - 360; 
-                    end
-                    if goal(4) < -180
-                        goal(4) = goal(4) + 360
-                    end
-                    obj.rosCont.SetGoal(3,goal,0)
-                    p = parfeval(backgroundPool, @obj.rosCont.doGoal);
-                end
-            end
             
             i = 1;
             while i < size(goalTraj, 1)
-                temp = obj.pollSafety();
-                if temp == 0
-                    if obj.safetyWait == 1
-                        if obj.realControl == 1
-                            if obj.turn == 1
-                                goal = goalTraj(end,:) + [180,0,0,-90,0,0];
-                                if goal(1) > 180
-                                    goal(1) = goal(1) - 360; 
-                                end
-                                if goal(4) < -180
-                                    goal(4) = goal(4) + 360
-                                end
-                                goal(3) = goal(3)*-1;
-                                obj.rosCont.SetGoal(3,goal,0)
-                                p = parfeval(@obj.rosCont.doGoal);
-                            end
-                        end
-                    end
-                    obj.safetyWait = temp;
-                end
-                if obj.safetyWait == 1
-                    cancel(p);
-                    obj.rosCont.cancelGoal()
-                    continue
+                wait(0.001);
+                if obj.pollSafety() == 1
+                    continue; 
                 end
                 qState = goalTraj(i,:);
 
@@ -220,10 +189,26 @@
                 end
                 i = i + 1; 
             end
-            if obj.realControl
-                wait(p);
-            end
 
+            if obj.realControl == 1
+                goalReached = 0; 
+                while goalReached == 0
+                    obj.rosCont.setGoal(1, goalTraj(end,:),1);
+                    obj.rosCont.doGoal();
+                    needsReset = 0;
+                    while obj.rosCont.checkGoal == 0
+                        if obj.pollSafety() == 1
+                            needsReset = 1;
+                            obj.rosCont.cancelGoal();
+                        else
+                            if needsReset
+                                break
+                            end
+                        end
+                    end
+                    goalReached = 1;
+                end
+            end
         end
 
         function wait = pollSafety(obj)
