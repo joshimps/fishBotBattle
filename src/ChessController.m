@@ -15,6 +15,8 @@
         rosCont; 
         realControl; 
         safetyWait;
+        arduinoObj;
+        eStopOn;
         newMove;
     end
     
@@ -30,6 +32,9 @@
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
             obj.realControl = realControl;
+            obj.arduinoObj = serialport("/dev/ttyACM0",9600);
+            configureTerminator(obj.arduinoObj,"CR/LF");
+            flush(obj.arduinoObj);
         end
 
         function chessGameEvE(obj)
@@ -211,12 +216,23 @@
             end
         end
 
-        function wait = pollSafety(obj)
+        function r = getRealEStop(obj)
+            arduinoObj.UserData = struct("Data",[],"Count",1);
+            data = readline(arduinoObj)
+            arduinoObj.UserData.Data(end+1) = data;
+            arduinoObj.UserData.Count = arduinoObj.UserData.Count + 1;
+            display(data)
+        end
+     
+        function safetyWait = pollSafety(obj)
             % Call collision poll
             % Call estop poll
+            if obj.eStopOn
+                safetyWait = 1;
+            end
             % Call light curtain poll
-            wait = false;
         end
+
     end
 end
 
