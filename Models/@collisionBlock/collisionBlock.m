@@ -7,7 +7,8 @@ classdef collisionBlock < handle
     properties (Access=private)
         boxMesh;
         vertexColours;
-        faces;      
+        faces; 
+        updatedVertex;
     end
 
     methods
@@ -32,14 +33,29 @@ classdef collisionBlock < handle
 
                 delete(self.boxMesh);
 
-                updatedVertex = self.vertex(:,3) + i;
-                self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), updatedVertex ...
+                self.updatedVertex = self.vertex(:,3) + i;
+
+                self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
                     ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
                 pause(1);
                 
             end
 
         end
+
+        function lowerBlock(self)
+
+            for i = 0.2 : -0.02: 0.01
+                delete(self.boxMesh);
+
+                self.updatedVertex = self.vertex(:,3) + i;
+
+                self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
+                    ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
+                pause(1);
+            end
+        end
+
 
     end
 
