@@ -34,9 +34,14 @@ void loop(){
     if(eStopOn){
         digitalWrite(ledPin,1);
         Serial.print(1);
+        Serial.write(13);
+        Serial.write(10);
+        
     }
     else{
         digitalWrite(ledPin,0);
         Serial.print(0);
+        Serial.write(13);
+        Serial.write(10);
     }
 }

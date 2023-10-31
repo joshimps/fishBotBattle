@@ -26,7 +26,8 @@
                 realControl = 0;
             end
             serialportlist("available")'
-            obj.arduinoObj = serialport("/dev/ttyACM0",9600);
+            obj.arduinoObj = serialport("/dev/ttyACM1",9600);
+
             configureTerminator(obj.arduinoObj,"CR/LF");
             flush(obj.arduinoObj);
             obj.arduinoObj.UserData = struct("Data",[]);
@@ -227,11 +228,16 @@
         end
 
         function r = getRealEStop(obj)
-            flush(obj.arduinoObj);
-            data = readline(obj.arduinoObj);
+            flush(obj.arduinoObj)
+            data = strtrim(readline(obj.arduinoObj));
+            while data == ""
+                flush(obj.arduinoObj)
+                data = strtrim(readline(obj.arduinoObj));
+            end
             obj.eStopOn = str2double(data);
             disp(['EstopStatus ',num2str(obj.eStopOn)])
             disp(['Estop Data ',data])
+            
         end
      
         function r = pollSafety(obj, robot, qmatrix)
