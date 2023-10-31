@@ -29,7 +29,6 @@
             obj.arduinoObj = serialport("/dev/ttyACM0",9600);
             configureTerminator(obj.arduinoObj,"CR/LF");
             flush(obj.arduinoObj);
-            obj.arduinoObj.UserData = struct("Data",[]);
             obj.safetyWait = 0;
             obj.turn = 0;  
             obj.sim = IRsim();
@@ -227,10 +226,9 @@
         end
 
         function r = getRealEStop(obj)
-            flush(obj.arduinoObj);
+            disp(['EstopStatus ',num2str(obj.eStopOn)])
             data = readline(obj.arduinoObj);
             obj.eStopOn = str2double(data);
-            disp(['EstopStatus ',num2str(obj.eStopOn)])
             disp(['Estop Data ',data])
         end
      

@@ -6,6 +6,5 @@ arduinoObj.UserData = struct("Data",[]);
 
 while true
     data = readline(arduinoObj);
-    arduinoObj.UserData.Data(1) = data;
     str2double(data)
 end

@@ -14,7 +14,7 @@ classdef RosController < handle
 
     methods
         function Connect(self, real_control, ip_add)
-            default_ip = 'http://mitch-pc:11311/';
+            default_ip = 'http://localhost:11311';
             if nargin > 2
                 default_ip = ip_add;
             end
@@ -22,7 +22,7 @@ classdef RosController < handle
                 rosshutdown
             end
             rosinit(default_ip)
-            %[self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
+            [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
             
             if real_control == 1
                 self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
