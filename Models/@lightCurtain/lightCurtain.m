@@ -143,7 +143,7 @@ classdef lightCurtain < handle
                 UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
                 self.vertex = UpdatedPoints(:,1:3);
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(1)
+                pause(0.011)
 
                 % self.check = self.checkCurtain();
                 % stop = self.check;

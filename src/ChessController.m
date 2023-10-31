@@ -16,7 +16,7 @@
         realControl; 
         safetyWait;
         arduinoObj;
-        eStopOn;
+      
         newMove;
     end
     
@@ -38,7 +38,6 @@
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
             obj.realControl = realControl;
-            obj.eStopOn = 0;
         end
 
         function chessGameEvE(obj)
@@ -184,7 +183,7 @@
             
             i = 1;
             while i < size(goalTraj, 1)
-                pause(0.01);
+                pause(0.001);
                 obj.pollSafety(robot, goalTraj(i,:))
                 if obj.safetyWait == 1
                     disp("SAFETY COMPROMISED");
@@ -234,17 +233,13 @@
                 flush(obj.arduinoObj)
                 data = strtrim(readline(obj.arduinoObj));
             end
-            obj.eStopOn = str2double(data);
-            disp(['EstopStatus ',num2str(obj.eStopOn)])
-            disp(['Estop Data ',data])
-            
+            r = str2double(data);  
         end
      
         function r = pollSafety(obj, robot, qmatrix)
-            % Call estop poll
-            obj.getRealEStop()
 
-            if obj.eStopOn == 1
+            % Call physical estop poll
+            if obj.getRealEStop() == 1
                 obj.safetyWait = 1;
                 return;
             end
@@ -261,7 +256,6 @@
                 return;
             end
         end
-
     end
 end
 
