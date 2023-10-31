@@ -14,6 +14,11 @@ pip install chess
 ## Setup
 Following dependency installation, the chess service must be added to the matlab path. 
 
+Generate the matlab messages on your local machine by running 
+```
+rosgenmsg('THIS_DIRECTORY')
+```
+
 To use the custom messages, follow these steps in the matlab command window:
  
 1. Add the custom message folder to the MATLAB path by executing:

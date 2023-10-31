@@ -1,8 +1,4 @@
  classdef ChessController < handle
-    %CHESSCONTROLLER Summary of this class goes here
-    %   Detailed explanation goes here
-    %% TODO
-    % add gripper control
     
     properties
         sim;
@@ -184,8 +180,7 @@
             i = 1;
             while i < size(goalTraj, 1)
                 pause(0.001);
-                obj.pollSafety(robot, goalTraj(i,:))
-                if obj.safetyWait == 1
+                if obj.safetyWait || obj.pollSafety(robot, goalTraj(i,:)) == 1
                     disp("SAFETY COMPROMISED");
                     continue; 
                 end
@@ -212,7 +207,7 @@
                     needsReset = 0;
                     while obj.rosCont.checkGoal == 0
                         obj.pollSafety(robot,goalTraj(i,:))
-                        if obj.safetyWait == 1
+                        if obj.safetyWait || obj.pollSafety(robot, goalTraj(i,:)) == 1
                             needsReset = 1;
                             obj.rosCont.cancelGoal();
                         else
@@ -225,7 +220,8 @@
                 end
             end
         end
-
+        
+        % Move this to the arduino object surely? 
         function r = getRealEStop(obj)
             flush(obj.arduinoObj)
             data = strtrim(readline(obj.arduinoObj));
@@ -235,24 +231,24 @@
             end
             r = str2double(data);  
         end
-     
-        function r = pollSafety(obj, robot, qmatrix)
-
+        
+        function wait = pollSafety(obj, robot, qmatrix)
+            wait = 0;
             % Call physical estop poll
             if obj.getRealEStop() == 1
-                obj.safetyWait = 1;
+                wait = 1;
                 return;
             end
 
             % Call collision poll
             if checkCollision(robot, qmatrix, obj.sim.box.vertex)
-                obj.safetyWait = 1;
+                wait = 1;
                 return;
             end
      
             % Call light curtain poll
             if obj.sim.curtain.checkCurtain()
-                obj.safetyWait = 1;
+                wait = 1;
                 return;
             end
         end
