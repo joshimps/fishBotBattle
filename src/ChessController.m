@@ -10,6 +10,7 @@
         turn;
         rosCont; 
         realControl; 
+        realContCalib; 
         safetyWait;
         arduinoObj;
         humanMoveSent;
@@ -30,10 +31,11 @@
             obj.turn = 0;  
             obj.humanMoveSent = 0;
             obj.sim = IRsim();
-            obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
-            obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
             obj.rosCont = RosController();
             obj.realControl = realControl;
+            obj.realContCalib = [1,-1,-1,-1,1,1];
+            obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
+            obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
         end
 
         function chessGameEvE(obj)
@@ -210,7 +212,8 @@
             if obj.realControl == 1
                 goalReached = 0; 
                 while goalReached == 0
-                    obj.rosCont.setGoal(1, goalTraj(end,:),1);
+                    goal = goalTraj(end,:) .* obj.realContCalib;
+                    obj.rosCont.setGoal(1, goal,1);
                     obj.rosCont.doGoal();
                     needsReset = 0;
                     while obj.rosCont.checkGoal == 0
