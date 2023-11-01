@@ -15,8 +15,8 @@ classdef lightCurtain < handle
         curtain2;
         x;
         y;
-        y_min;
-        y_max;
+        x_min;
+        x_max;
         z;
         laserStartPoint;
         laserEndPoint;
@@ -41,9 +41,9 @@ classdef lightCurtain < handle
             end
 
             self.x = baseTr(1,4);
-            self.y = baseTr(2,4);
-            self.y_min = baseTr(2,4) - 0.3;
-            self.y_max = baseTr(2,4) + 0.3;
+            self.y = baseTr(2,4) - 0.3;
+            self.x_min = baseTr(1,4) - 0.3;
+            self.x_max = baseTr(1,4) + 0.3;
             self.z = 0;
 
             self.laserStartPoint = [];
@@ -60,15 +60,11 @@ classdef lightCurtain < handle
         %% Create Light Curtain
         function createLightCurtain(self)
 
-            % bottomLeft = [-0.5 -0.5 0];
-            % topRight = [-0.5 0.5 1];
-            % self.x = 0.5;
-            % self.y = 0.5;
-            self.bottomLeft = [self.x self.y_min 0];
-            self.topRight = [self.x self.y_max 1];
+            self.bottomLeft = [self.x_min self.y 0];
+            self.topRight = [self.x_max self.y 1];
 
-            self.curtain1 = PlaceObject('lightCurtain.ply', [self.x self.y_min-0.01 0]);
-            self.curtain2 = PlaceObject('lightCurtain.ply', [self.x self.y_max 0]);
+            self.curtain1 = PlaceObject('lightCurtain.ply', [self.x_min-0.01 self.y 0]);
+            self.curtain2 = PlaceObject('lightCurtain.ply', [self.x_max self.y 0]);
 
             laserNormals = [self.bottomLeft(1)-self.topRight(1), self.bottomLeft(2)-self.topRight(2), 0];
             laserCenters = 0.05;
@@ -97,10 +93,6 @@ classdef lightCurtain < handle
 
                 hold on;
 
-                % plot3(self.laserStartPoint(i, 1),self.laserStartPoint(i, 2),self.laserStartPoint(i, 3) ,'r*');
-
-                % plot3(self.laserEndPoint(i, 1),self.laserEndPoint(i, 2),self.laserEndPoint(i, 3) ,'r*');
-
                 plot3([self.laserStartPoint(i, 1),self.laserEndPoint(i, 1)],[self.laserStartPoint(i, 2),self.laserEndPoint(i, 2)],[self.laserStartPoint(i, 3),self.laserEndPoint(i, 3)] ,'r');
 
                 axis equal
@@ -117,15 +109,15 @@ classdef lightCurtain < handle
             self.handVertexCount = size(self.vertex,1);
 
             for i = 1 : self.handVertexCount
-                self.vertex(i,1) = self.vertex(i,1) + self.x + 0.5;
-                self.vertex(i,2) = self.vertex(i,2) + self.y;
+                self.vertex(i,1) = self.vertex(i,1) + self.x;
+                self.vertex(i,2) = self.vertex(i,2) + self.y - 0.5;
                 self.vertex(i,3) = self.vertex(i,3) + self.z + 0.5;
             end
 
             self.handMesh_h = trisurf(faces,self.vertex(:,1)+handCentre(1,1),self.vertex(:,2)+handCentre(1,2), self.vertex(:,3)+handCentre(1,3) ...
                 ,'FaceVertexCData',vertexColours,'EdgeColor','none','EdgeLighting','none');
             light('style', 'local', 'Position', [-2 1 1]);
-            axis([-1 1 -1 1 0 1]);
+            
 
         end
 
@@ -135,25 +127,16 @@ classdef lightCurtain < handle
             stop = 0;
 
 
-            for i = 0 :0.005 : 0.2
+            for i = 0.01 :0.005 : 0.5
 
                 hold on
-                hand_pose = transl(-i, 0, 0);
+                hand_pose = transl(0, 0.005, 0);
                 self.handVertexCount = size(self.vertex,1);
                 UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
                 self.vertex = UpdatedPoints(:,1:3);
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(0.001)
+                pause(0.011)
 
-                % self.check = self.checkCurtain();
-                % stop = self.check;
-                % if self.check == 1
-                %     self.currentIndex = i;
-                %     stopMessage = sprintf('STOP: Curtain plane has been broken');
-                %     disp(stopMessage) % display status to command window for log
-                %     self.figure_message = text(0, 1, 1, stopMessage); % display status in the figure
-                %     break
-                % end
             end
         end
         %% Remove hand
@@ -161,40 +144,29 @@ classdef lightCurtain < handle
 
             resume = 0;
             disp(self.currentIndex)
-            for i = 0.2 :-0.005 : 0
+            for i = 0.5 : -0.005 : 0.1
                 hold on
-                hand_pose = transl(i, 0, 0);
+                hand_pose = transl(0, -0.005, 0);
                 self.handVertexCount = size(self.vertex,1);
                 UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
                 self.vertex = UpdatedPoints(:,1:3);
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(0.001)
-
-                % self.check = self.checkCurtain();
-                % resume = self.check;
-                % if self.check == 0
-                % 
-                %     resumeMessage = sprintf('Resume: Curtain plane has been unbroken');
-                %     disp(resumeMessage) % display status to command window for log
-                %     delete(self.figure_message);
-                %     self.figure_message = text(0, 1, 1, resumeMessage); % display status in the figure
-                %     resume = 1;
-                %     return;
-                % 
-                % end
+                pause(0.011)
             end
         end
         %%
 
-
         function r = checkCurtain(self)
             for j = 1 : self.handVertexCount
                 if self.vertex(j,3) < self.topRight(3)
-                    if  self.vertex(j,1) < self.bottomLeft(1)
-                        if self.vertex(j,2) > self.bottomLeft(2)
-                            if self.vertex(j,2) < self.topRight(2)
-                                r = 1;
+                    if  self.vertex(j,1) > self.bottomLeft(1)
+                        if self.vertex(j,1) < self.topRight(1)
+                            if self.vertex(j,2) > self.bottomLeft(2)
+
+                                self.check = 1;
+                                r=1;
                                 return
+
                             end
                         end
                     end
@@ -204,6 +176,5 @@ classdef lightCurtain < handle
             return
         end
     end
-
 end
 
