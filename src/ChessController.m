@@ -12,6 +12,7 @@
         realControl; 
         safetyWait;
         arduinoObj;
+        humanMoveSent;
         newMove;
     end
     
@@ -21,13 +22,13 @@
                 realControl = 0;
             end
             serialportlist("available")'
-            obj.arduinoObj = serialport("/dev/ttyACM0",9600);
-
+            obj.arduinoObj = serialport("/dev/ttyACM1",9600);
             configureTerminator(obj.arduinoObj,"CR/LF");
             flush(obj.arduinoObj);
             obj.arduinoObj.UserData = struct("Data",[]);
             obj.safetyWait = 0;
             obj.turn = 0;  
+            obj.humanMoveSent = 0;
             obj.sim = IRsim();
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
             obj.MoveRobot(obj.sim.tm5, obj.tmWaitPose, true);
@@ -60,21 +61,29 @@
             obj.rosCont.Connect(realControl); 
             obj.realControl = realControl; 
             disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
-            prevMove = newMove; 
-            obj.interpMoveString(newMove);
+            while obj.humanMoveSent ~= 1
+                pause(0.001);
+            end
+            prevMove = obj.newMove; 
+            obj.interpMoveString(obj.newMove);
+            obj.humanMoveSent = 0;
             while true
                 if obj.turn == 1
                     engineMove = obj.rosCont.getMove(prevMove(1:4));
-                    newMove = engineMove.Move;
-                else
+                    obj.newMove = engineMove.Move;
+                else  
                     obj.rosCont.getMove(prevMove(1:4));
                 end
                     
-                if size(newMove,2) < 1
+                if size(obj.newMove,2) < 1
                     break;
                 else
-                    obj.interpMoveString(newMove);
-                    prevMove = newMove;
+                    while obj.humanMoveSent ~= 1
+                        pause(0.001);
+                    end
+                    obj.interpMoveString(obj.newMove);
+                    prevMove = obj.newMove;
+                    obj.humanMoveSent = 0;
                 end
             end
             disp("Game is over, winner is " + ~obj.turn);
