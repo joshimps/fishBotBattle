@@ -30,7 +30,7 @@ classdef omronTM5 < customRobotBaseClass
             link(1) = Link('d',0.1452,'a',0,'alpha',pi/2,'qlim',deg2rad([-360 360]), 'offset',0);
             link(2) = Link('d',0.146,'a',0.429,'alpha',0,'qlim', deg2rad([-360 360]), 'offset',pi/2);
             link(3) = Link('d',-0.1297,'a',0.4115,'alpha',0,'qlim', deg2rad([-360 360]), 'offset', 0);
-            link(4) = Link('d',0.106,'a',0,'alpha',-pi/2,'qlim',deg2rad([-360 360]),'offset', -pi/2;
+            link(4) = Link('d',0.106,'a',0,'alpha',-pi/2,'qlim',deg2rad([-360 360]),'offset', -pi/2);
             link(4) = Link('d',0.106,'a',0,'alpha',-pi/2,'qlim',deg2rad([-360 360]),'offset', -pi/2);
             link(5) = Link('d',0.106,'a',0,'alpha',pi/2,'qlim',deg2rad([-360,360]), 'offset',0);
             link(6) = Link('d',0.1132,'a',0,'alpha',0,'qlim',deg2rad([-360,360]), 'offset', 0);
