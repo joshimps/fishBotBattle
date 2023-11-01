@@ -135,7 +135,7 @@ classdef lightCurtain < handle
             stop = 0;
 
 
-            for i = 0.01 :0.005 : 0.5
+            for i = 0 :0.005 : 0.2
 
                 hold on
                 hand_pose = transl(-i, 0, 0);
@@ -143,7 +143,7 @@ classdef lightCurtain < handle
                 UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
                 self.vertex = UpdatedPoints(:,1:3);
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(0.011)
+                pause(0.001)
 
                 % self.check = self.checkCurtain();
                 % stop = self.check;
@@ -160,16 +160,15 @@ classdef lightCurtain < handle
         function resume = UnblockCurtain(self)
 
             resume = 0;
-
-            for i = self.currentIndex :0.005 : 0.2
-
+            disp(self.currentIndex)
+            for i = 0.2 :-0.005 : 0
                 hold on
                 hand_pose = transl(i, 0, 0);
                 self.handVertexCount = size(self.vertex,1);
                 UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
                 self.vertex = UpdatedPoints(:,1:3);
                 self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(1)
+                pause(0.001)
 
                 % self.check = self.checkCurtain();
                 % resume = self.check;
@@ -188,22 +187,21 @@ classdef lightCurtain < handle
         %%
 
 
-        function check = checkCurtain(self)
-
-            check = 0;
-
+        function r = checkCurtain(self)
             for j = 1 : self.handVertexCount
                 if self.vertex(j,3) < self.topRight(3)
                     if  self.vertex(j,1) < self.bottomLeft(1)
                         if self.vertex(j,2) > self.bottomLeft(2)
                             if self.vertex(j,2) < self.topRight(2)
-                                check = 1;
+                                r = 1;
                                 return
                             end
                         end
                     end
                 end
             end
+            r = 0;
+            return
         end
     end
 
