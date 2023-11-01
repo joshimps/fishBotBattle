@@ -37,7 +37,7 @@ classdef collisionBlock < handle
 
                 self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
                     ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
-                pause(1);
+                pause(0.5);
                 
             end
 
@@ -52,7 +52,7 @@ classdef collisionBlock < handle
 
                 self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
                     ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
-                pause(1);
+                pause(0.5);
             end
         end
 
