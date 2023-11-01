@@ -12,6 +12,7 @@
         realControl; 
         safetyWait;
         arduinoObj;
+      
         newMove;
     end
     
@@ -21,7 +22,7 @@
                 realControl = 0;
             end
             serialportlist("available")'
-            obj.arduinoObj = serialport("/dev/ttyACM0",9600);
+            obj.arduinoObj = serialport("/dev/ttyACM1",9600);
 
             configureTerminator(obj.arduinoObj,"CR/LF");
             flush(obj.arduinoObj);
@@ -179,8 +180,8 @@
             i = 1;
             while i < size(goalTraj, 1)
                 pause(0.001);
-                obj.pollSafety(robot, goalTraj(i,:));
-                if obj.safetyWait == 1
+                if obj.safetyWait || obj.pollSafety(robot, goalTraj(i,:)) == 1
+                    disp("SAFETY COMPROMISED");
                     continue; 
                 end
 
@@ -206,7 +207,7 @@
                     needsReset = 0;
                     while obj.rosCont.checkGoal == 0
                         obj.pollSafety(robot,goalTraj(i,:))
-                        if obj.safetyWait == 1
+                        if obj.safetyWait || obj.pollSafety(robot, goalTraj(i,:)) == 1
                             needsReset = 1;
                             obj.rosCont.cancelGoal();
                         else
@@ -235,21 +236,18 @@
             % Call physical estop poll
             if obj.getRealEStop() == 1
                 obj.safetyWait = 1;
-                disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");
                 return;
             end
 
             % Call collision poll
             if checkCollision(robot, qmatrix, obj.sim.box.vertex)
                  obj.safetyWait = 1;
-                 disp("SAFETY COMPROMISED, COLLISION DETECTED");
                 return;
             end
      
             % Call light curtain poll
             if obj.sim.curtain.checkCurtain()
                  obj.safetyWait = 1;
-                 disp("SAFETY COMPROMISED, CURTAIN BREACH DETECTED");
                 return;
             end
         end

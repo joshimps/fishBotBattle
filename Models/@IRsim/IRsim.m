@@ -35,8 +35,8 @@ classdef IRsim < handle
                 ,'FaceColor','texturemap');
             
             ur_tr = baseTr * transl(-0.15, 0.25, 0);
-            omron_tr = baseTr * transl(0.75,0.25,0.1);
-            curtain_tr = baseTr * transl(0.25, -0.5, 0) * troty(pi/2);
+            omron_tr = baseTr * transl(0.75,0.25,0.1) * trotz(pi/2);
+            curtain_tr = baseTr * transl(0.25, -0.2, 0) * troty(pi/2);
 
             self.ur = ur3(ur_tr);
                 
