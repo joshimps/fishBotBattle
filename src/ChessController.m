@@ -23,7 +23,7 @@
                 realControl = 0;
             end
             % serialportlist("available")'
-            % obj.arduinoObj = serialport("/dev/ttyACM1",9600);
+            % obj.arduinoObj = serialport("/dev/ttyACM0",9600);
             % configureTerminator(obj.arduinoObj,"CR/LF");
             % flush(obj.arduinoObj);
             % obj.arduinoObj.UserData = struct("Data",[]);
@@ -32,6 +32,7 @@
             obj.humanMoveSent = 0;
             obj.sim = IRsim();
             obj.rosCont = RosController();
+            obj.rosCont.Connect(1,'http://localhost:11311');
             obj.realControl = realControl;
             obj.realContCalib = [1,-1,-1,-1,1,1];
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
@@ -45,7 +46,7 @@
             obj.interpMoveString(prevMove);
             gameIsOver = 0; 
             while ~gameIsOver
-                newMove = obj.rosCont.getMove(prevMove(1:4));
+                % newMove = obj.rosCont.getMove(prevMove(1:4));
                 if size(newMove.Move,2) < 1
                     gameIsOver = true;
                 end
@@ -71,10 +72,10 @@
             obj.humanMoveSent = 0;
             while true
                 if obj.turn == 1
-                    engineMove = obj.rosCont.getMove(prevMove(1:4));
+                    % engineMove = obj.rosCont.getMove(prevMove(1:4));
                     obj.newMove = engineMove.Move;
                 else  
-                    obj.rosCont.getMove(prevMove(1:4));
+                    % obj.rosCont.getMove(prevMove(1:4));
                 end
                     
                 if size(obj.newMove,2) < 1

@@ -23,7 +23,7 @@ classdef RosController < handle
                 rosshutdown
             end
             rosinit(default_ip)
-            [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
+            % [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
             
             if real_control == 1
                 self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
@@ -32,22 +32,22 @@ classdef RosController < handle
                 self.currentJointState_123456 = (self.jointStateSubscriber.LatestMessage.Position)';
                 self.jointNames = {'shoulder_1_joint','shoulder_2_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'};
     
-                [self.controlClient, self.goal] = rosactionclient('/scaled_pos_joint_traj_controller/follow_joint_trajectory');
+                [self.controlClient, self.goal] = rosactionclient('/follow_joint_trajectory');
                 self.seq = 1; 
             end
         end
 
-        function [recMove] = getMove(self,sendMove)
-            self.chessMove.PrevMove = sendMove;
-            recMove = call(self.chessClient, self.chessMove);
-        end
+        % function [recMove] = getMove(self,sendMove)
+        %     self.chessMove.PrevMove = sendMove;
+        %     recMove = call(self.chessClient, self.chessMove);
+        % end
 
         function actuate_gripper(self)
             gripperClient = rossvcclient('/gripper_serv', 'std_srvs/Trigger');
             call(gripperClient);
         end
 
-        function SetGoal(self, duration, joints, reset)
+        function setGoal(self, duration, joints, reset)
             self.goalQ = joints;
             self.goal.Trajectory.JointNames = self.jointNames;
             self.seq = self.seq + 1; 
