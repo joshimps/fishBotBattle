@@ -23,7 +23,7 @@ classdef RosController < handle
                 rosshutdown
             end
             rosinit(default_ip)
-            % [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
+            [self.chessClient, self.chessMove] = rossvcclient("/chess_service", "fishbot_ros/chess_service");
             
             if real_control == 1
                 self.jointStateSubscriber = rossubscriber('joint_states','sensor_msgs/JointState');
@@ -37,10 +37,10 @@ classdef RosController < handle
             end
         end
 
-        % function [recMove] = getMove(self,sendMove)
-        %     self.chessMove.PrevMove = sendMove;
-        %     recMove = call(self.chessClient, self.chessMove);
-        % end
+        function [recMove] = getMove(self,sendMove)
+            self.chessMove.PrevMove = sendMove;
+            recMove = call(self.chessClient, self.chessMove);
+        end
 
         function actuate_gripper(self)
             gripperClient = rossvcclient('/gripper_serv', 'std_srvs/Trigger');

@@ -22,11 +22,11 @@
             if nargin < 1
                 realControl = 0;
             end
-            % serialportlist("available")'
-            % obj.arduinoObj = serialport("/dev/ttyACM0",9600);
-            % configureTerminator(obj.arduinoObj,"CR/LF");
-            % flush(obj.arduinoObj);
-            % obj.arduinoObj.UserData = struct("Data",[]);
+            serialportlist("available")'
+            obj.arduinoObj = serialport("/dev/ttyACM0",9600);
+            configureTerminator(obj.arduinoObj,"CR/LF");
+            flush(obj.arduinoObj);
+            obj.arduinoObj.UserData = struct("Data",[]);
             obj.safetyWait = 0;
             obj.turn = 0;  
             obj.humanMoveSent = 0;
@@ -46,7 +46,7 @@
             obj.interpMoveString(prevMove);
             gameIsOver = 0; 
             while ~gameIsOver
-                % newMove = obj.rosCont.getMove(prevMove(1:4));
+                newMove = obj.rosCont.getMove(prevMove(1:4));
                 if size(newMove.Move,2) < 1
                     gameIsOver = true;
                 end
@@ -72,10 +72,10 @@
             obj.humanMoveSent = 0;
             while true
                 if obj.turn == 1
-                    % engineMove = obj.rosCont.getMove(prevMove(1:4));
+                    engineMove = obj.rosCont.getMove(prevMove(1:4));
                     obj.newMove = engineMove.Move;
                 else  
-                    % obj.rosCont.getMove(prevMove(1:4));
+                    obj.rosCont.getMove(prevMove(1:4));
                 end
                     
                 if size(obj.newMove,2) < 1
@@ -233,24 +233,23 @@
             end
         end
         
-        % Move this to the arduino object surely? 
-        % function r = getRealEStop(obj)
-        %     flush(obj.arduinoObj)
-        %     data = strtrim(readline(obj.arduinoObj));
-        %     while data == ""
-        %         flush(obj.arduinoObj)
-        %         data = strtrim(readline(obj.arduinoObj));
-        %     end
-        %     r = str2double(data);  
-        % end
+        function r = getRealEStop(obj)
+            flush(obj.arduinoObj)
+            data = strtrim(readline(obj.arduinoObj));
+            while data == ""
+                flush(obj.arduinoObj)
+                data = strtrim(readline(obj.arduinoObj));
+            end
+            r = str2double(data);  
+        end
         
         function r = pollSafety(obj, robot, qmatrix)
-            % Call physical estop poll
-            % if obj.getRealEStop() == 1
-            %     obj.safetyWait = 1;
-            %     disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");
-            %     return;
-            % end
+            Call physical estop poll
+            if obj.getRealEStop() == 1
+                obj.safetyWait = 1;
+                disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");
+                return;
+            end
 
             % Call collision poll
             if checkCollision(robot, qmatrix, obj.sim.box.vertex)
