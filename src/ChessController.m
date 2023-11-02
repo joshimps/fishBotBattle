@@ -32,7 +32,6 @@
             obj.humanMoveSent = 0;
             obj.sim = IRsim();
             obj.rosCont = RosController();
-            obj.rosCont.Connect(1,'http://localhost:11311');
             obj.realControl = realControl;
             obj.realContCalib = [1,-1,-1,-1,1,1];
             obj.MoveRobot(obj.sim.ur, obj.urWaitPose, true);
@@ -72,21 +71,28 @@
             obj.humanMoveSent = 0;
             while true
                 if obj.turn == 1
+                    disp(["PREVIOUS MOVE ", prevMove])
                     engineMove = obj.rosCont.getMove(prevMove(1:4));
                     obj.newMove = engineMove.Move;
+                    disp(["ENGINE MOVE ", obj.newMove])
+                    obj.interpMoveString(obj.newMove);
+                    prevMove = obj.newMove;
                 else  
-                    obj.rosCont.getMove(prevMove(1:4));
+                    while obj.humanMoveSent ~= 1
+                        pause(0.001);
+                        disp("HERE");
+                    end
+                    disp(["PREVIOUS MOVE ", prevMove])
+                    obj.interpMoveString(obj.newMove);
+                    disp(["PLAYER MOVE ", obj.newMove])
+                    prevMove = obj.newMove;
+                    obj.humanMoveSent = 0;
                 end
                     
                 if size(obj.newMove,2) < 1
                     break;
                 else
-                    while obj.humanMoveSent ~= 1
-                        pause(0.001);
-                    end
-                    obj.interpMoveString(obj.newMove);
-                    prevMove = obj.newMove;
-                    obj.humanMoveSent = 0;
+                     
                 end
             end
             disp("Game is over, winner is " + ~obj.turn);
@@ -244,7 +250,7 @@
         end
         
         function r = pollSafety(obj, robot, qmatrix)
-            Call physical estop poll
+            %Call physical estop poll
             if obj.getRealEStop() == 1
                 obj.safetyWait = 1;
                 disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");

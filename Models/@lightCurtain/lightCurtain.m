@@ -29,6 +29,7 @@ classdef lightCurtain < handle
         Vertices;
         currentIndex;
         figure_message;
+        curtainBlocked;
     end
 
 
@@ -52,6 +53,7 @@ classdef lightCurtain < handle
             self.createLightCurtain();
             self.plotLightCurtain();
             self.check = 0;
+            self.curtainBlocked = 0;
 
             self.createHand();
 
@@ -123,35 +125,38 @@ classdef lightCurtain < handle
 
         %% Move Cat & Rectangular Prism
         function stop = blockCurtain(self)
-
+            
             stop = 0;
-
-
-            for i = 0.01 :0.005 : 0.5
-
-                hold on
-                hand_pose = transl(0, 0.005, 0);
-                self.handVertexCount = size(self.vertex,1);
-                UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
-                self.vertex = UpdatedPoints(:,1:3);
-                self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(0.011)
-
+            
+            if self.curtainBlocked == 0
+                for i = 0.01 :0.005 : 0.5
+                    hold on
+                    hand_pose = transl(0, 0.005, 0);
+                    self.handVertexCount = size(self.vertex,1);
+                    UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
+                    self.vertex = UpdatedPoints(:,1:3);
+                    self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
+                    pause(0.011)
+                end
+                self.curtainBlocked = 1
             end
+            
         end
         %% Remove hand
         function resume = UnblockCurtain(self)
 
             resume = 0;
-            disp(self.currentIndex)
-            for i = 0.5 : -0.005 : 0.1
-                hold on
-                hand_pose = transl(0, -0.005, 0);
-                self.handVertexCount = size(self.vertex,1);
-                UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
-                self.vertex = UpdatedPoints(:,1:3);
-                self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
-                pause(0.011)
+            if self.curtainBlocked == 1
+                for i = 0.5 : -0.005 : 0.1
+                    hold on
+                    hand_pose = transl(0, -0.005, 0);
+                    self.handVertexCount = size(self.vertex,1);
+                    UpdatedPoints = [hand_pose * [self.vertex,ones(self.handVertexCount,1)]']';
+                    self.vertex = UpdatedPoints(:,1:3);
+                    self.handMesh_h.Vertices = UpdatedPoints(:,1:3);
+                    pause(0.011)
+                end
+                self.curtainBlocked = 0
             end
         end
         %%

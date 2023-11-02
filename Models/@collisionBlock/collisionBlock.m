@@ -2,6 +2,7 @@ classdef collisionBlock < handle
 
     properties
         vertex;
+        
     end
 
     properties (Access=private)
@@ -9,6 +10,7 @@ classdef collisionBlock < handle
         vertexColours;
         faces; 
         updatedVertex;
+        boxLifted;
     end
 
     methods
@@ -18,6 +20,7 @@ classdef collisionBlock < handle
             self.vertex(:,1) = self.vertex(:,1) + 0.2;
             self.vertex(:,2) = self.vertex(:,2) + 0.2;
             self.vertex(:,3) = self.vertex(:,3) - 0.2;
+            self.boxLifted = 0;
         end
 
         function plotBlock(self)
@@ -28,31 +31,35 @@ classdef collisionBlock < handle
         end
 
         function liftBlock(self)   
-
-            for i = 0.01 :0.02 : 0.2
-
-                delete(self.boxMesh);
-
-                self.updatedVertex = self.vertex(:,3) + i;
-
-                self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
-                    ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
-                pause(0.5);
-                
+            
+            if self.boxLifted == 0
+                for i = 0.01 :0.02 : 0.2
+    
+                    delete(self.boxMesh);
+    
+                    self.updatedVertex = self.vertex(:,3) + i;
+    
+                    self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
+                        ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
+                    pause(0.5);
+                end
+                self.boxLifted = 1;
             end
-
         end
 
         function lowerBlock(self)
-
-            for i = 0.2 : -0.02: 0.01
-                delete(self.boxMesh);
-
-                self.updatedVertex = self.vertex(:,3) + i;
-
-                self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
-                    ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
-                pause(0.5);
+            
+            if self.boxLifted == 1
+                for i = 0.2 : -0.02: 0.01
+                    delete(self.boxMesh);
+    
+                    self.updatedVertex = self.vertex(:,3) + i;
+    
+                    self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
+                        ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
+                    pause(0.5);
+                end
+                 self.boxLifted = 0;
             end
         end
 
