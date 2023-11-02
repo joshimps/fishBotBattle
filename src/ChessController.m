@@ -1,10 +1,10 @@
  classdef ChessController < handle
-    
+    %CALIBRATED BOARD POSITION = base = eye(4) * transl(0.0023, -0.14,0.065) 
     properties
         sim;
         urReadyPose = [0, -1.1, -2, -1.5, 1.8,0];
         urWaitPose = [0 -0.25 -2.4 -0.4 1.8 0];
-        tmReadyPose = [-pi/2, -0.17, 1.9, 0.129, -1.5,0];
+        tmReadyPose = [-1.3963    0.2164    1.2664    0.1047   -1.5301    0.1351];
         tmWaitPose = [-pi/2, -0.67, 1.9, -0.28, -1.5,0];
         ready = [];
         turn;
@@ -22,11 +22,11 @@
             if nargin < 1
                 realControl = 0;
             end
-            serialportlist("available")'
-            obj.arduinoObj = serialport("/dev/ttyACM1",9600);
-            configureTerminator(obj.arduinoObj,"CR/LF");
-            flush(obj.arduinoObj);
-            obj.arduinoObj.UserData = struct("Data",[]);
+            % serialportlist("available")'
+            % obj.arduinoObj = serialport("/dev/ttyACM1",9600);
+            % configureTerminator(obj.arduinoObj,"CR/LF");
+            % flush(obj.arduinoObj);
+            % obj.arduinoObj.UserData = struct("Data",[]);
             obj.safetyWait = 0;
             obj.turn = 0;  
             obj.humanMoveSent = 0;
@@ -59,7 +59,7 @@
             disp("Game is over, winner is " + ~obj.turn);
         end
 
-        function chessGamePvE(obj, realControl);
+        function chessGamePvE(obj, realControl)
             obj.rosCont.Connect(realControl); 
             obj.realControl = realControl; 
             disp("Moves shall be entered as follows startend,capture,castle. For example, e2e4,0,0");
@@ -196,7 +196,7 @@
                 end
 
                 qState = goalTraj(i,:);
-                % move robot, gripper and, if applicable, the brick
+                % move robot, gripper and, if applicable, the piece
                 robot.model.animate(qState);
                 eePose = robot.model.fkine(robot.model.getpos);
                 drawnow();
@@ -233,23 +233,23 @@
         end
         
         % Move this to the arduino object surely? 
-        function r = getRealEStop(obj)
-            flush(obj.arduinoObj)
-            data = strtrim(readline(obj.arduinoObj));
-            while data == ""
-                flush(obj.arduinoObj)
-                data = strtrim(readline(obj.arduinoObj));
-            end
-            r = str2double(data);  
-        end
+        % function r = getRealEStop(obj)
+        %     flush(obj.arduinoObj)
+        %     data = strtrim(readline(obj.arduinoObj));
+        %     while data == ""
+        %         flush(obj.arduinoObj)
+        %         data = strtrim(readline(obj.arduinoObj));
+        %     end
+        %     r = str2double(data);  
+        % end
         
         function r = pollSafety(obj, robot, qmatrix)
             % Call physical estop poll
-            if obj.getRealEStop() == 1
-                obj.safetyWait = 1;
-                disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");
-                return;
-            end
+            % if obj.getRealEStop() == 1
+            %     obj.safetyWait = 1;
+            %     disp("SAFETY COMPROMISED, PHYSICAL E STOP PRESSED");
+            %     return;
+            % end
 
             % Call collision poll
             if checkCollision(robot, qmatrix, obj.sim.box.vertex)

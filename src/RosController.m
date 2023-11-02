@@ -7,6 +7,7 @@ classdef RosController < handle
         jointNames;
         controlClient;
         goal;
+        goalQ; 
         seq;
         chessClient;
         chessMove; 
@@ -43,10 +44,11 @@ classdef RosController < handle
 
         function actuate_gripper(self)
             gripperClient = rossvcclient('/gripper_serv', 'std_srvs/Trigger');
-            resp = call(gripperClient);
+            call(gripperClient);
         end
 
         function SetGoal(self, duration, joints, reset)
+            self.goalQ = joints;
             self.goal.Trajectory.JointNames = self.jointNames;
             self.seq = self.seq + 1; 
             self.goal.Trajectory.Header.Seq = self.seq;
@@ -55,18 +57,19 @@ classdef RosController < handle
             bufferSeconds = 1; % This allows for the time taken to send the message. If the network is fast, this could be reduced.
            
             if reset == 1
-                currentJointState_321456 = (self.jointStateSubscriber.LatestMessage.Position)'; % Note the default order of the joints is 3,2,1,4,5,6
-                self.currentJointState_123456 = [currentJointState_321456(3:-1:1),currentJointState_321456(4:6)];
+                self.currentJointState_123456 = (self.jointStateSubscriber.LatestMessage.Position)'; 
             end
             
 
             startJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
             startJointSend.Positions = self.currentJointState_123456;
+            startJointSend.Velocities = zeros(1,6);
             startJointSend.TimeFromStart = rosduration(0);    
             
             endJointSend = rosmessage('trajectory_msgs/JointTrajectoryPoint');
             self.nextJointState = joints;
             endJointSend.Positions = joints;
+            endJointSend.Velocities = zeros(1,6);
             endJointSend.TimeFromStart = rosduration(duration);
 
             self.goal.Trajectory.Points = [startJointSend; endJointSend];
@@ -80,10 +83,12 @@ classdef RosController < handle
         end
 
         function done = checkGoal(self)
-            if strcmp(self.controlClient.GoalState, 'active')
-                done = 0; 
-            else 
+            currentJointState_123456 = (self.jointStateSubscriber.LatestMessage.Position)';
+            err = abs((currentJointState_123456/self.goalQ)*100 - 100);
+            if err <= 1
                 done = 1;
+            else 
+                done = 0;
             end
         end
 

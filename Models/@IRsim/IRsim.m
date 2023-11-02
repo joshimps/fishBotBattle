@@ -41,7 +41,7 @@ classdef IRsim < handle
             self.ur = ur3(ur_tr);
                 
             self.environment = PlaceObject('robotRoom_PvP.ply', [0 0 0]);
-            self.tm5 = omronTM5(omron_tr);
+            self.tm5 = omronTM5_700(omron_tr);
             self.curtain = lightCurtain(curtain_tr);
             
             self.board = ChessBoard();
