@@ -83,6 +83,7 @@
                         disp("HERE");
                     end
                     disp(["PREVIOUS MOVE ", prevMove])
+                    obj.rosCont.getMove(prevMove(1:4));
                     obj.interpMoveString(obj.newMove);
                     disp(["PLAYER MOVE ", obj.newMove])
                     prevMove = obj.newMove;
