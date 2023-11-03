@@ -259,7 +259,7 @@
             end
 
             % Call collision poll
-            if checkCollision(robot, qmatrix, obj.sim.box.vertex)
+            if checkCollision(robot, qmatrix, obj.sim.box.visVertex)
                  obj.safetyWait = 1;
                  disp("SAFETY COMPROMISED, COLLISION DETECTED");
                 return;

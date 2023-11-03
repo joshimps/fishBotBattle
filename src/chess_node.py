@@ -6,7 +6,7 @@ import chess
 import chess.svg
 from chess import engine
 from fishbot_ros.srv import chess_service, chess_serviceRequest, chess_serviceResponse
-from tm_msgs.srv import SendScript, SendScriptRequest
+# from tm_msgs.srv import SendScript, SendScriptRequest
 from std_srvs.srv import Trigger, TriggerResponse
 
 
@@ -39,22 +39,22 @@ def chessCallback(req):
         return chess_serviceResponse(result)
     else: return chess_serviceResponse("")
 
-def gripperCallback(req):
-    msg = SendScriptRequest()
-    msg.id = 'ExitListener'
-    msg.script = 'ScriptExit()'
-    grip(msg)
-    foo = "Gripper is now " + states[state]
-    state != state
-    return TriggerResponse(success=True, message=foo)
+# def gripperCallback(req):
+#     msg = SendScriptRequest()
+#     msg.id = 'ExitListener'
+#     msg.script = 'ScriptExit()'
+#     grip(msg)
+#     foo = "Gripper is now " + states[state]
+#     state != state
+#     return TriggerResponse(success=True, message=foo)
 
 
 if __name__ == "__main__":
     rospy.init_node("Chess_Engine")
     rospy.loginfo("Starting Chess Engine")
     serv = rospy.Service('chess_service', chess_service, chessCallback)
-    gripListen = rospy.Service('gripper_serv', Trigger, gripperCallback)
-    grip = rospy.ServiceProxy('tm_driver/send_script', SendScript)
+    # gripListen = rospy.Service('gripper_serv', Trigger, gripperCallback)
+    # grip = rospy.ServiceProxy('tm_driver/send_script', SendScript)
     rospy.loginfo("Chess Engine Ready")
     while not rospy.is_shutdown():
         pass

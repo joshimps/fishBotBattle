@@ -2,6 +2,7 @@ classdef collisionBlock < handle
 
     properties
         vertex;
+        visVertex; 
         
     end
 
@@ -21,6 +22,7 @@ classdef collisionBlock < handle
             self.vertex(:,2) = self.vertex(:,2) + 0.2;
             self.vertex(:,3) = self.vertex(:,3) - 0.2;
             self.boxLifted = 0;
+            self.visVertex = self.vertex;
         end
 
         function plotBlock(self)
@@ -33,11 +35,12 @@ classdef collisionBlock < handle
         function liftBlock(self)   
             
             if self.boxLifted == 0
-                for i = 0.01 :0.02 : 0.2
+                for i = 0.01 :0.04 : 0.4
     
                     delete(self.boxMesh);
     
                     self.updatedVertex = self.vertex(:,3) + i;
+                    self.visVertex(:,3) = self.updatedVertex;
     
                     self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
                         ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
@@ -50,10 +53,11 @@ classdef collisionBlock < handle
         function lowerBlock(self)
             
             if self.boxLifted == 1
-                for i = 0.2 : -0.02: 0.01
+                for i = 0.4 : -0.04: 0.01
                     delete(self.boxMesh);
     
                     self.updatedVertex = self.vertex(:,3) + i;
+                    self.visVertex(:,3) = self.updatedVertex;
     
                     self.boxMesh = trisurf(self.faces, self.vertex(:,1), self.vertex(:,2), self.updatedVertex ...
                         ,'FaceVertexCData',self.vertexColours,'EdgeColor','none', 'EdgeLighting','none');
